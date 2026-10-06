@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="数据光盘刻录指南：介质、UDF、会话、光驱固件与备份实操。">
+  <title>数据光盘刻录指南</title>
+  <style>{{STYLE}}</style>
+</head>
+<body>
+  <a class="skip-link" href="#document">跳到正文</a>
+  <div class="read-progress" id="read-progress" aria-hidden="true"></div>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">CD · DVD · BD</div>
+      <h1>数据光盘<br><span>刻录指南</span></h1>
+      <p class="hero-subtitle">从选盘、写入到读回校验</p>
+      <div class="hero-meta">
+        <span>修订 <strong>2026 年 10 月 6 日</strong></span>
+      </div>
+    </div>
+    <div class="disc-art" aria-hidden="true"><div class="disc-core"></div></div>
+  </header>
+  <div class="page-shell">
+    <aside class="sidebar" aria-label="文档导航">
+      <div class="sidebar-head">
+        <span class="sidebar-title">阅读导航</span>
+        <button id="theme-toggle" class="icon-button" type="button" aria-label="切换明暗主题" title="切换明暗主题">◐</button>
+      </div>
+      <button id="toc-toggle" class="toc-toggle" type="button" aria-controls="toc-panel" aria-expanded="false">展开章节目录 <span aria-hidden="true">⌄</span></button>
+      <div id="toc-panel" class="toc-panel">
+        <label class="search-label" for="nav-search">筛选章节</label>
+        <input id="nav-search" type="search" placeholder="输入标题关键词…" autocomplete="off">
+        <nav id="toc" class="toc">{{TOC}}</nav>
+      </div>
+    </aside>
+    <div class="main-stack">
+      <main id="document" class="paper" tabindex="-1">
+        <article class="document-body">{{CONTENT}}</article>
+      </main>
+      <footer class="site-footer">
+        <p>写完后重插读回；不可替代的资料至少保留第二份副本。</p>
+      </footer>
+    </div>
+  </div>
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="返回顶部" title="返回顶部">↑</button>
+  <script>{{SCRIPT}}</script>
+</body>
+</html>

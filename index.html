@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="数据光盘刻录指南：介质、UDF、会话、光驱固件与备份实操。">
+  <title>数据光盘刻录指南</title>
+  <style>:root {
+  color-scheme: light;
+  --bg: #eef3f7;
+  --paper: #ffffff;
+  --ink: #172839;
+  --muted: #5c6c7a;
+  --line: #d9e3e9;
+  --blue: #16638b;
+  --blue-dark: #0c3e5e;
+  --teal: #16848a;
+  --aside: #edf9f8;
+  --caution: #fff4db;
+  --danger: #fdf0ed;
+  --shadow: 0 24px 70px rgba(28, 55, 77, .08);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #101a23;
+  --paper: #162431;
+  --ink: #eaf3fa;
+  --muted: #aabcc9;
+  --line: #304657;
+  --blue: #76c5eb;
+  --blue-dark: #b4dcf2;
+  --teal: #6ad5cd;
+  --aside: #183b41;
+  --caution: #493a20;
+  --danger: #4b2928;
+  --shadow: 0 24px 70px rgba(0, 0, 0, .2);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.85 "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; }
+button, input { font: inherit; }
+a { color: var(--blue); text-underline-offset: .18em; }
+a:hover { color: var(--teal); }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #e8ac54; outline-offset: 3px; }
+.skip-link { position: absolute; z-index: 20; top: -60px; left: 16px; padding: .45rem .8rem; background: var(--paper); }
+.skip-link:focus { top: 12px; }
+.read-progress { position: fixed; top: 0; left: 0; height: 4px; width: 0; z-index: 50; background: #72e1d0; box-shadow: 0 0 12px rgba(114,225,208,.55); }
+.hero { position: relative; overflow: hidden; border-bottom: 2px solid #4baaa8; background: radial-gradient(circle at 78% 40%, #236b84, transparent 35%), linear-gradient(120deg, #0b344c, #0f4f68 68%, #126e75); color: white; }
+.hero-inner { position: relative; z-index: 1; width: min(1240px, calc(100% - 48px)); margin: auto; padding: 44px 0 38px; }
+.eyebrow { color: #a9e3dd; font-size: .75rem; font-weight: 700; letter-spacing: .16em; }
+.hero h1 { max-width: 660px; margin: 14px 0 10px; font-size: clamp(2.25rem, 5.2vw, 4rem); line-height: 1.13; letter-spacing: -.04em; }
+.hero h1 span { color: #b7ebe9; }
+.hero-subtitle { margin: 0 0 17px; color: #e0f0f2; font-size: clamp(1rem, 2vw, 1.2rem); }
+.hero-meta { color: #bbd6da; font-size: .78rem; }
+.hero-meta strong { color: inherit; font-weight: 600; }
+.disc-art { position: absolute; right: max(4vw, 40px); top: -57px; width: 360px; aspect-ratio: 1; border: 1px solid rgba(208,247,243,.28); border-radius: 50%; background: repeating-radial-gradient(circle, transparent 0 16px, rgba(211,246,245,.13) 17px 18px, transparent 19px 29px), radial-gradient(circle, rgba(181,239,235,.15), transparent 67%); opacity: .7; transform: rotate(-18deg); }
+.disc-core { position: absolute; inset: 42%; border: 1px solid rgba(227,255,251,.4); border-radius: 50%; background: #14566e; }
+.page-shell { display: grid; grid-template-columns: minmax(215px, 260px) minmax(0, 870px); gap: clamp(18px, 3vw, 40px); max-width: 1240px; margin: 0 auto; padding: 34px 24px 70px; align-items: start; }
+.sidebar { position: sticky; top: 22px; max-height: calc(100vh - 44px); overflow-y: auto; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); box-shadow: var(--shadow); scrollbar-width: thin; }
+.sidebar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.sidebar-title { font-size: .94rem; font-weight: 850; color: var(--blue-dark); }
+.icon-button { border: 1px solid var(--line); border-radius: 10px; width: 35px; height: 35px; color: var(--blue); background: transparent; cursor: pointer; }
+.toc-toggle { display: none; width: 100%; padding: .55rem .7rem; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: var(--blue-dark); font-size: .82rem; font-weight: 750; text-align: left; cursor: pointer; }
+.toc-toggle span { float: right; }
+.search-label { display: block; margin-bottom: 5px; color: var(--muted); font-size: .74rem; font-weight: 700; }
+#nav-search { width: 100%; padding: .52rem .7rem; border-radius: 9px; border: 1px solid var(--line); color: var(--ink); background: var(--bg); font-size: .82rem; }
+.toc { display: grid; gap: 2px; margin: 16px 0 20px; }
+.toc a { display: block; padding: .44rem .58rem; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: .8rem; line-height: 1.45; }
+.toc a[data-depth="2"] { margin-top: 9px; color: var(--blue-dark); font-weight: 800; }
+.toc a[data-depth="3"] { padding-left: 1rem; }
+.toc a[data-depth="4"] { padding-left: 1.5rem; font-size: .75rem; }
+.toc a:hover, .toc a.active { color: var(--blue-dark); background: var(--aside); }
+.toc a[hidden] { display: none; }
+.sidebar-footer { display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 14px; }
+.sidebar-footer a { font-size: .75rem; text-decoration: none; }
+.main-stack { min-width: 0; }
+.source-banner { padding: 14px 20px; margin-bottom: 18px; border: 1px solid #9fd5d7; border-left: 5px solid var(--teal); border-radius: 12px; background: var(--aside); font-size: .84rem; }
+.source-banner strong { color: var(--blue-dark); }
+.source-banner p { margin: .18rem 0 0; color: var(--muted); }
+.paper { background: var(--paper); border: 1px solid var(--line); border-radius: 19px; box-shadow: var(--shadow); }
+.document-body { max-width: 100%; padding: clamp(24px, 4.5vw, 62px); font-size: .99rem; line-height: 1.9; overflow-wrap: anywhere; }
+.document-body > :first-child { margin-top: 0; }
+.document-body h1, .document-body h2, .document-body h3, .document-body h4 { scroll-margin-top: 26px; line-height: 1.4; letter-spacing: -.02em; }
+.document-body h1 { font-size: clamp(1.8rem, 3vw, 2.55rem); color: var(--blue-dark); margin: .2rem 0 1.4rem; padding-bottom: .6rem; border-bottom: 2px solid var(--line); }
+.document-body h2 { margin: 3.6rem 0 1.2rem; padding: 0 0 .55rem; border-bottom: 2px solid var(--line); color: var(--blue-dark); font-size: clamp(1.5rem, 2.6vw, 2rem); }
+.document-body h3 { margin: 2.6rem 0 .9rem; color: var(--blue); font-size: 1.37rem; }
+.document-body h4 { margin: 1.9rem 0 .65rem; color: var(--blue-dark); font-size: 1.08rem; }
+.heading-anchor { display: inline-block; margin-left: .42em; opacity: 0; font-size: .68em; vertical-align: middle; text-decoration: none; }
+h1:hover .heading-anchor, h2:hover .heading-anchor, h3:hover .heading-anchor, h4:hover .heading-anchor, .heading-anchor:focus { opacity: 1; }
+.document-body p { margin: .75rem 0 1rem; }
+.document-body strong { color: var(--blue-dark); }
+.document-body ul, .document-body ol { padding-left: 1.4rem; }
+.document-body li { padding-left: .18rem; margin: .25rem 0; }
+.document-body li::marker { color: var(--teal); font-weight: 700; }
+.document-body blockquote { margin: 1.3rem 0; padding: .75rem 1.2rem; border-left: 4px solid var(--teal); border-radius: 0 10px 10px 0; background: var(--aside); }
+.document-body blockquote p { margin: .35rem 0; }
+.document-body aside { margin: 1.3rem 0; padding: 1rem 1.2rem; border-radius: 11px; border-left: 4px solid var(--teal); background: var(--aside); }
+.document-body aside.warning { background: var(--caution); border-color: #dfa246; }
+.document-body aside.danger { background: var(--danger); border-color: #da6a5a; }
+.document-body aside p { margin: .3rem 0; }
+.document-body hr { margin: 2.3rem 0; border: 0; border-top: 1px solid var(--line); }
+.document-body code { font-family: "Cascadia Code", Consolas, monospace; font-size: .9em; border-radius: 4px; padding: .08em .27em; background: var(--bg); }
+.document-body pre { overflow-x: auto; padding: 1rem 1.2rem; border-radius: 9px; background: #162b3a; color: #e4f2fa; }
+.document-body pre code { padding: 0; color: inherit; background: transparent; }
+.table-scroll { max-width: 100%; overflow-x: auto; margin: 1.2rem 0 1.7rem; border: 1px solid var(--line); border-radius: 11px; }
+.table-scroll table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: .83rem; line-height: 1.62; }
+.table-scroll.wide table { min-width: 1050px; }
+.table-scroll th, .table-scroll td { padding: .65rem .73rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.table-scroll th { position: sticky; top: 0; color: var(--blue-dark); background: var(--aside); font-weight: 800; }
+.table-scroll tr:last-child td { border-bottom: 0; }
+.table-scroll tr:nth-child(even) td { background: color-mix(in srgb, var(--bg) 50%, var(--paper)); }
+.document-body img { display: block; max-width: 100%; height: auto; margin: 1.3rem auto; border-radius: 8px; }
+.document-body .guide-diagram { max-width: 100%; margin: 1.45rem 0 1.8rem; padding: .7rem; overflow-x: auto; border: 1px solid var(--line); border-radius: 13px; background: #f6fafc; }
+.document-body .guide-diagram img { display: block; width: 100%; min-width: 650px; max-width: none; height: auto; margin: 0; border-radius: 7px; }
+.document-body .guide-diagram figcaption { margin: .65rem .25rem .1rem; color: var(--muted); font-size: .82rem; line-height: 1.6; }
+.walkthrough-steps { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 1.3rem 0 1.8rem; }
+.document-body .walkthrough-steps figure { min-width: 0; margin: 0; padding: .75rem; border: 1px solid var(--line); border-radius: 12px; background: #f6fafc; }
+.document-body .walkthrough-steps img { display: block; width: auto; max-width: 100%; height: auto; margin: 0 auto; border-radius: 5px; }
+.document-body .walkthrough-steps figcaption { margin: .6rem .15rem .1rem; color: var(--muted); font-size: .82rem; line-height: 1.6; }
+.reference-figure { margin: 1.4rem 0 1.8rem; padding: .85rem; border: 1px solid var(--line); border-radius: 13px; background: color-mix(in srgb, var(--bg) 58%, var(--paper)); }
+.figure-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.figure-gallery[data-count="1"] { grid-template-columns: minmax(0, 1fr); max-width: 430px; margin: auto; }
+.photo .figure-gallery[data-count="1"] { max-width: none; }
+.figure-cell { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: .35rem; padding: .65rem; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: #3b4854; text-align: center; }
+.figure-cell img, .document-body .figure-cell img { width: auto; max-width: 100%; height: auto; max-height: 165px; margin: 0; border-radius: 4px; object-fit: contain; }
+.photo .figure-cell img, .document-body .photo .figure-cell img { width: 100%; height: auto; max-height: 310px; object-fit: contain; }
+.figure-cell span { font-size: .76rem; line-height: 1.45; }
+.reference-figure figcaption { margin: .65rem .25rem .05rem; color: var(--muted); font-size: .79rem; line-height: 1.6; }
+.figure-number { color: var(--blue-dark); font-weight: 800; }
+.reference-figure figcaption a { white-space: nowrap; }
+.image-credits { margin: 0 clamp(24px, 4.5vw, 62px); padding: 1.8rem 0 2.4rem; border-top: 2px solid var(--line); color: var(--muted); font-size: .8rem; line-height: 1.7; }
+.image-credits h2 { margin: 0 0 .65rem; color: var(--blue-dark); font-size: 1.22rem; }
+.image-credits p { margin: 0 0 1rem; }
+.image-credits ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.6rem; row-gap: .48rem; padding-left: 1.25rem; }
+.image-credits li { padding-left: .15rem; overflow-wrap: anywhere; }
+.image-credits strong { color: var(--ink); }
+.image-credits code { overflow-wrap: anywhere; word-break: break-all; }
+.yearbook-viewer { margin: 1.3rem 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--paper); }
+.yearbook-toolbar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .6rem .85rem; background: var(--aside); color: var(--blue-dark); font-size: .78rem; font-weight: 750; }
+.yearbook-toolbar button { flex: none; padding: .27rem .65rem; border: 1px solid var(--teal); border-radius: 8px; background: var(--paper); color: var(--blue-dark); cursor: pointer; font-size: .78rem; }
+.yearbook-viewer img { display: block; width: 100%; max-width: none; height: auto; margin: 0; border-radius: 0; }
+.yearbook-viewer.expanded { position: fixed; inset: 2vh 2vw; z-index: 100; margin: 0; overflow: auto; box-shadow: 0 0 0 100vmax rgba(8, 23, 35, .68), var(--shadow); }
+.yearbook-viewer.expanded img { width: 4000px; }
+.uncertain { color: #a95126; background: var(--caution); border-bottom: 1px dashed currentColor; padding: 0 .18em; }
+.print-only { display: none; }
+.site-footer { padding: 22px 5px 0; color: var(--muted); font-size: .75rem; line-height: 1.65; }
+.site-footer p { margin: .3rem 0; }
+.back-to-top { position: fixed; right: 25px; bottom: 22px; z-index: 30; width: 42px; height: 42px; border: 0; border-radius: 50%; background: var(--blue-dark); color: var(--paper); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.back-to-top.visible { opacity: 1; pointer-events: auto; }
+@media (max-width: 830px) {
+  .page-shell { display: block; padding: 17px 13px 60px; }
+  .sidebar { position: static; max-height: none; margin-bottom: 16px; }
+  .toc-toggle { display: block; }
+  .toc-panel { display: none; max-height: 58vh; overflow-y: auto; padding-top: 15px; }
+  .sidebar.open .toc-panel { display: block; }
+  .toc { grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); }
+  .toc a[data-depth="3"], .toc a[data-depth="4"] { padding-left: .58rem; }
+  .hero-inner { padding: 38px 0 34px; }
+  .disc-art { right: -145px; top: -52px; opacity: .4; }
+  .document-body { padding: 25px 20px; }
+  .image-credits { margin: 0 20px; }
+  .image-credits ol { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .disc-art { display: none; }
+  .photo .figure-gallery, .logo .figure-gallery[data-count="2"] { grid-template-columns: minmax(0, 1fr); }
+  .document-body .guide-diagram::after { content: "图示可左右滑动查看"; display: block; margin: .15rem .25rem 0; color: var(--muted); font-size: .74rem; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .back-to-top { transition: none; } }
+@media print {
+  @page { size: A4; margin: 16mm; }
+  :root { color-scheme: light; --paper: #fff; --ink: #111; --muted: #444; --line: #ccc; --blue: #164b6e; --blue-dark: #103c55; --aside: #eaf5f6; }
+  body { font-size: 10pt; background: white; }
+  .hero { min-height: 0; color: #111; background: white; border-bottom: 3px solid #164b6e; }
+  .hero-inner { width: auto; padding: 0 0 16mm; }
+  .hero h1, .hero h1 span { color: #103c55; }
+  .hero-subtitle, .hero-meta span, .eyebrow { color: #333; }
+  .hero-meta span { padding: 0; }
+  .hero-meta strong { color: #111; }
+  .disc-art, .sidebar, .back-to-top, .read-progress, .heading-anchor, .skip-link { display: none !important; }
+  .page-shell { display: block; max-width: none; padding: 0; }
+  .paper { border: 0; border-radius: 0; box-shadow: none; }
+  .document-body { padding: 0; font-size: 10pt; }
+  .document-body h2 { break-before: page; }
+  .document-body h2:first-of-type { break-before: auto; }
+  .document-body h2.appendix-heading { break-before: auto; }
+  .document-body h1, .document-body h2, .document-body h3, .document-body h4, .document-body table, .document-body aside, .document-body blockquote, .reference-figure, .guide-diagram { break-inside: avoid; }
+  .document-body .guide-diagram { overflow: visible; padding: 0; border: 0; }
+  .document-body .guide-diagram img { min-width: 0; width: 100%; }
+  .reference-figure { background: white; }
+  .image-credits { margin: 0; }
+  .yearbook-viewer { display: none; }
+  .print-only { display: block; }
+  .table-scroll { overflow: visible; border: 0; }
+  .table-scroll table { min-width: 0; width: 100%; }
+  .table-scroll thead { display: table-header-group; }
+  .table-scroll th, .table-scroll td { border: 1px solid #bbb; }
+  .source-banner { border-color: #bbb; }
+  a { color: inherit; }
+}
+
+  .document-body .layers { display: grid; gap: .55rem; margin: 1.4rem 0 1.8rem; }
+  .document-body .layers > div { display: flex; gap: 1.1rem; align-items: baseline;
+    padding: .7rem 1rem; border: 1px solid var(--line, #d9e1e9); border-radius: 9px;
+    background: var(--panel, #f4f8fb); }
+  .document-body .layers b { min-width: 8.5rem; color: var(--accent, #246c9c); }
+  .document-body .layers span { flex: 1; }
+  .document-body .source-ref { white-space: nowrap; font-size: .82em; font-weight: 700; }
+  .document-body .figure-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    gap: .7rem; margin: 1.1rem 0 1.8rem; }
+  .document-body .figure-grid-photos { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .document-body .figure-grid figure { min-width: 0; margin: 0; padding: .7rem;
+    background: var(--panel, #f4f8fb); border: 1px solid var(--line, #d9e1e9); border-radius: 9px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: .45rem; }
+  .document-body .figure-grid img { display: block; width: 100%; height: 85px; object-fit: contain; }
+  .document-body .figure-grid-photos img { height: 160px; }
+  .document-body .figure-grid figcaption { text-align: center; line-height: 1.3;
+    font-size: .78rem; color: var(--muted, #5a6672); }
+  .document-body :target { scroll-margin-top: 1.5rem; }
+  @media (max-width: 560px) { .document-body .layers > div { display: block; }
+    .document-body .layers b { display: block; margin-bottom: .25rem; }
+    .document-body .figure-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .document-body .figure-grid-photos { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#document">跳到正文</a>
+  <div class="read-progress" id="read-progress" aria-hidden="true"></div>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">CD · DVD · BD</div>
+      <h1>数据光盘<br><span>刻录指南</span></h1>
+      <p class="hero-subtitle">从选盘、写入到读回校验</p>
+      <div class="hero-meta">
+        <span>修订 <strong>2026 年 10 月 6 日</strong></span>
+      </div>
+    </div>
+    <div class="disc-art" aria-hidden="true"><div class="disc-core"></div></div>
+  </header>
+  <div class="page-shell">
+    <aside class="sidebar" aria-label="文档导航">
+      <div class="sidebar-head">
+        <span class="sidebar-title">阅读导航</span>
+        <button id="theme-toggle" class="icon-button" type="button" aria-label="切换明暗主题" title="切换明暗主题">◐</button>
+      </div>
+      <button id="toc-toggle" class="toc-toggle" type="button" aria-controls="toc-panel" aria-expanded="false">展开章节目录 <span aria-hidden="true">⌄</span></button>
+      <div id="toc-panel" class="toc-panel">
+        <label class="search-label" for="nav-search">筛选章节</label>
+        <input id="nav-search" type="search" placeholder="输入标题关键词…" autocomplete="off">
+        <nav id="toc" class="toc"><a data-depth="2" href="#section-1">一、盘片容量、记录层与保存条件</a>
+<a data-depth="3" href="#section-2">1.1 盘片容量与记录层</a>
+<a data-depth="4" href="#section-3">CD：记录区靠近印刷面</a>
+<a data-depth="4" href="#section-4">DVD：记录区在两片基板之间</a>
+<a data-depth="4" href="#section-5">BD：记录区靠近读盘面</a>
+<a data-depth="4" href="#section-6">BD 双层与 BDXL</a>
+<a data-depth="3" href="#section-7">1.2 续写、覆写和重写</a>
+<a data-depth="3" href="#section-8">1.3 染料、相变层、HTL／LTH、M-DISC</a>
+<a data-depth="3" href="#section-9">1.4 保存寿命、材料标识与存放条件</a>
+<a data-depth="3" href="#section-10">1.5 MID 与盘片批次</a>
+<a data-depth="3" href="#section-11">1.6 质量扫描的时间与设备条件</a>
+<a data-depth="2" href="#section-12">二、光驱的读写能力</a>
+<a data-depth="3" href="#section-13">2.1 机芯尺寸与连接方式</a>
+<a data-depth="3" href="#section-14">2.2 面板标志与实际 Profile</a>
+<a data-depth="3" href="#section-15">2.3 光驱类型与可写盘型</a>
+<a data-depth="3" href="#section-16">2.4 历代代表机型</a>
+<a data-depth="3" href="#section-17">2.5 光驱寿命与写入速度</a>
+<a data-depth="3" href="#section-18">2.6 UHD Friendly、官方 UHD、LibreDrive 与刷机</a>
+<a data-depth="3" href="#section-19">2.7 Disc Information 与质量扫描</a>
+<a data-depth="2" href="#section-20">三、文件系统与写入方式</a>
+<a data-depth="3" href="#section-21">3.1 物理盘片、会话与文件目录</a>
+<a data-depth="3" href="#section-22">3.2 ISO 9660、Joliet 与 UDF</a>
+<a data-depth="3" href="#section-23">3.3 ISO 镜像与普通文件</a>
+<a data-depth="3" href="#section-24">3.4 扇区布局与纠错</a>
+<a data-depth="3" href="#section-25">3.5 Windows 的 Live 与 Mastered</a>
+<a data-depth="4" href="#section-26">3.5.1 Windows Live 盘的读取兼容性</a>
+<a data-depth="3" href="#section-27">3.6 格式化、擦除与 zeroing</a>
+<a data-depth="3" href="#section-28">3.7 多会话与旧目录导入</a>
+<a data-depth="3" href="#section-29">3.8 关闭轨道、会话与整盘</a>
+<a data-depth="2" href="#section-30">四、购买光驱和盘片</a>
+<a data-depth="3" href="#section-31">4.1 光驱的写入与 UHD 读取能力</a>
+<a data-depth="3" href="#section-32">4.2 盘片产地与产品系列</a>
+<a data-depth="4" href="#section-33">4.2.1 产地、品牌与实际制造商</a>
+<a data-depth="4" href="#section-34">4.2.2 CD、DVD 与 BD 候选系列</a>
+<a data-depth="3" href="#section-35">4.3 写入速度与质量检查</a>
+<a data-depth="3" href="#section-36">4.4 采购数量和到货测试</a>
+<a data-depth="2" href="#section-37">五、刻录与读回校验</a>
+<a data-depth="3" href="#section-38">5.1 从空盘到首次校验</a>
+<a data-depth="3" href="#section-39">5.2 用 ImgBurn 刻录普通文件</a>
+<a data-depth="3" href="#section-40">5.3 用 ImgBurn 写入 ISO 镜像</a>
+<a data-depth="3" href="#section-41">5.4 用 Windows Live 分批写入</a>
+<a data-depth="3" href="#section-42">5.5 用 Windows Mastered 刻录文件</a>
+<a data-depth="3" href="#section-43">5.6 用 CDBurnerXP 续写会话</a>
+<a data-depth="3" href="#section-44">5.7 擦写 DVD-RW 与 BD-RE</a>
+<a data-depth="3" href="#section-45">5.8 生成并核对 SHA-256 清单</a>
+<a data-depth="3" href="#section-46">5.9 质量扫描与常见故障</a>
+<a data-depth="2" href="#section-47">六、资料来源</a></nav>
+      </div>
+    </aside>
+    <div class="main-stack">
+      <main id="document" class="paper" tabindex="-1">
+        <article class="document-body"><p>本文基于 Bedcore《数据光盘刻录理论入门》V1.0.2 改写，按 <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.zh-hans">CC BY-SA 3.0</a> 分享。<a href="https://www.bilibili.com/video/BV1itur6qExK/">Bedcore 的视频</a>是基础版本的获取入口。产品、固件与软件资料核查于 2026-10-06。</p>
+<p>备好文件后，可直接从第五章的刻录步骤读起；遇到盘型、光驱或兼容性问题，再查前四章。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>要做什么</th>
+<th>介质与写入方式</th>
+<th>写完怎样确认</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>备份已整理好的一批文件</td>
+<td>DVD±R／BD-R；用 ImgBurn <code>Write files/folders to disc</code> 一次写入</td>
+<td>Verify、弹出重插、逐文件哈希</td>
+</tr>
+<tr>
+<td>制作 Linux 安装盘或恢复盘</td>
+<td>容量足够的空白盘；用 <code>Write image file to disc</code> 按原镜像写入</td>
+<td>核对下载哈希、刻后校验，并在目标电脑试启动</td>
+</tr>
+<tr>
+<td>分几周陆续添加文件</td>
+<td>Windows Live 或已验证可导入旧会话的刻录软件</td>
+<td>每次重插后同时打开旧文件与新文件</td>
+</tr>
+<tr>
+<td>经常修改、删除和复用</td>
+<td>DVD±RW／BD-RE；先测试所选 UDF 写入模式</td>
+<td>保存、弹出、重插、读回，再测试擦除</td>
+</tr>
+<tr>
+<td>长期保存不可替代的资料</td>
+<td>固定快照与校验清单，至少两份放在不同地点或介质上</td>
+<td>定期重读，并在设备或介质老化前迁移</td>
+</tr>
+</tbody></table></div>
+<p>将 <code>movie.mkv</code> 复制到 DVD，只会得到数据盘；DVD-Video 需要另做编排。安装镜像也要按镜像写盘，直接复制 <code>linux.iso</code> 不会做出启动盘。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a><a class="source-ref" href="#source-s6" aria-label="资料 S6">[S6]</a></p>
+<h2 id="section-1">一、盘片容量、记录层与保存条件<a class="heading-anchor" href="#section-1" aria-label="本节链接">#</a></h2>
+<h3 id="section-2">1.1 盘片容量与记录层<a class="heading-anchor" href="#section-2" aria-label="本节链接">#</a></h3>
+<p>CD、DVD、BD 分别用近红外、红光、蓝紫光读写。<code>R</code> 通常表示一次写入，<code>RW</code>、<code>RE</code>、<code>RAM</code> 表示可重写；<code>DL</code>、<code>TL</code>、<code>QL</code> 是双层、三层、四层。50 GB BD-R DL 是双层盘，100 GB 三层和 128 GB 四层盘属于 BDXL。光驱对 BD-R DL、BDXL 和 UHD 电影的支持需要分别确认。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<figure class="guide-diagram"><img src="assets/diagrams/disc-families.svg" alt="CD、DVD 和 BD 常见容量、层数与一次写入或可擦写类型的对照" loading="lazy"><figcaption>容量、层数和可擦写性是三个不同的属性。图中列出常见规格，完整容量见下表。</figcaption></figure>
+
+<p>单层盘有一个记录层位，双层盘在同一读盘面下有两个，光头改变焦点深度来选层。只读盘的数据是模压凹坑；一次写入盘和可擦写盘在记录材料中形成标记。下面的剖面从印刷面画到读盘面，双面 DVD 两面都可读。薄膜已放大，色块高度不代表实际厚度。<a class="source-ref" href="#source-s14" aria-label="资料 S14">[S14]</a><a class="source-ref" href="#source-s15" aria-label="资料 S15">[S15]</a></p>
+<p>“数据面”通常指朝向光头的读盘面；数据并不直接露在表面。CD 的记录区贴近印刷面，DVD 在盘体中间，BD 则靠近读盘面。<a class="source-ref" href="#source-s14" aria-label="资料 S14">[S14]</a><a class="source-ref" href="#source-s15" aria-label="资料 S15">[S15]</a></p>
+<h4 id="section-3">CD：记录区靠近印刷面<a class="heading-anchor" href="#section-3" aria-label="本节链接">#</a></h4>
+<figure class="guide-diagram"><img src="assets/diagrams/cd-disc-stack.svg" alt="CD-ROM、CD-R、CD-RW 从印刷面到读盘面的完整剖面：薄漆与反射层靠近顶面，下面是厚基板" loading="lazy"><figcaption>CD-ROM 的凹坑模压在基板上；CD-R 用有机染料，CD-RW 用相变膜。三者都从基板一侧读盘。印刷面下的漆层较薄，顶面深划伤可能伤及反射层。<a class="source-ref" href="#source-s14" aria-label="资料 S14">[S14]</a></figcaption></figure>
+
+<p>CD-RW 的相变膜通常夹在介电层之间；CD-R 的染料和金属反射层分开。印刷层可有可无，不能代替保护记录区的薄漆。<a class="source-ref" href="#source-s14" aria-label="资料 S14">[S14]</a></p>
+<h4 id="section-4">DVD：记录区在两片基板之间<a class="heading-anchor" href="#section-4" aria-label="本节链接">#</a></h4>
+<figure class="guide-diagram"><img src="assets/diagrams/dvd-disc-stack.svg" alt="六种 DVD 剖面：单层只读、一次写入、可擦写、DVD+R 双层、只读双层与双面单层" loading="lazy"><figcaption>单面 DVD 的两片基板在中心胶合，读盘光线从下方进入。双层盘的近端层须半透明，光头才能聚焦更深一层；双面盘两面都有读盘面，通常只能在内圈贴小标签。<a class="source-ref" href="#source-s14" aria-label="资料 S14">[S14]</a><a class="source-ref" href="#source-s17" aria-label="资料 S17">[S17]</a></figcaption></figure>
+
+<p>单层 DVD±R 通常用有机染料，DVD±RW 与 DVD-RAM 用相变材料，只读 DVD 使用模压凹坑。图中的 DVD+R DL 是早期威宝／三菱结构：靠近读盘面的 L0 有半透反射层，激光穿过它聚焦到 L1。双层 DVD-ROM 也有其他层序。双层盘从同一面读取两层；双面盘则要翻面，两种结构可以组合。<a class="source-ref" href="#source-s14" aria-label="资料 S14">[S14]</a><a class="source-ref" href="#source-s17" aria-label="资料 S17">[S17]</a></p>
+<h4 id="section-5">BD：记录区靠近读盘面<a class="heading-anchor" href="#section-5" aria-label="本节链接">#</a></h4>
+<figure class="guide-diagram"><img src="assets/diagrams/bd-disc-stack.svg" alt="BD-ROM、BD-R HTL、BD-R LTH、BD-RE 从印刷面到读盘面的完整剖面，记录区位于薄覆盖层后" loading="lazy"><figcaption>BD 的读写光线从约 0.1 mm 透明覆盖层一侧进入；外面的硬涂层是表面防护，不是记录层。图中的 BD-R 薄膜层序只是技术白皮书所示例子，各厂家材料和层数可能不同。<a class="source-ref" href="#source-s15" aria-label="资料 S15">[S15]</a><a class="source-ref" href="#source-s16" aria-label="资料 S16">[S16]</a><a class="source-ref" href="#source-s18" aria-label="资料 S18">[S18]</a></figcaption></figure>
+
+<p>BD-ROM 使用模压凹坑；BD-R HTL 常用无机材料，LTH 用有机染料，BD-RE 用相变材料。BD 的厚基板在印刷侧，光线从约 0.1 mm 的覆盖层进入，故读盘面上的灰尘和划伤更值得留意。“Hard Coat”是表面硬涂层，不是数据层；HTL／LTH 也不说明反射层用了什么金属。<a class="source-ref" href="#source-s15" aria-label="资料 S15">[S15]</a><a class="source-ref" href="#source-s16" aria-label="资料 S16">[S16]</a><a class="source-ref" href="#source-s18" aria-label="资料 S18">[S18]</a></p>
+<h4 id="section-6">BD 双层与 BDXL<a class="heading-anchor" href="#section-6" aria-label="本节链接">#</a></h4>
+<figure class="guide-diagram"><img src="assets/diagrams/recording-layers.svg" alt="BD-R 单层、BD-R DL 双层、BDXL 三层与四层的完整盘体剖面：印刷面、基板、多个记录层、间隔层、覆盖层及读盘面" loading="lazy"><figcaption>四种盘都从同一面读盘。光头穿过近端的半透层和透明间隔层，聚焦更深的层；图把近读盘面的薄结构放大。<a class="source-ref" href="#source-s15" aria-label="资料 S15">[S15]</a><a class="source-ref" href="#source-s16" aria-label="资料 S16">[S16]</a><a class="source-ref" href="#source-s18" aria-label="资料 S18">[S18]</a></figcaption></figure>
+
+<p>BD 单层记录区距读盘面约 100 µm。双层盘的 L0 约 100 µm、L1 约 75 µm；BD-RE 三层示例中的 L2 约 57 µm。三层、四层盘仍把各层置于读盘面附近，以透明材料间隔，具体尺寸随规格变化。层数增加也提高了聚焦和层间串扰的要求。<a class="source-ref" href="#source-s15" aria-label="资料 S15">[S15]</a><a class="source-ref" href="#source-s16" aria-label="资料 S16">[S16]</a><a class="source-ref" href="#source-s18" aria-label="资料 S18">[S18]</a></p>
+<p>标准 12 cm 盘的常见容量如下。容量相同的 R 与 RW／RE 仍是不同盘型。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>标称容量</th>
+<th>常见盘型</th>
+<th align="right">Windows 约显示</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>700 MB</td>
+<td>CD-R、CD-RW</td>
+<td align="right">667 MiB</td>
+</tr>
+<tr>
+<td>4.7 GB</td>
+<td>DVD±R、DVD±RW、DVD-RAM、DVD M-DISC</td>
+<td align="right">4.38 GiB</td>
+</tr>
+<tr>
+<td>8.5 GB</td>
+<td>DVD±R DL；双层可擦写盘少见</td>
+<td align="right">7.92 GiB</td>
+</tr>
+<tr>
+<td>25 GB</td>
+<td>BD-R、BD-RE</td>
+<td align="right">23.3 GiB</td>
+</tr>
+<tr>
+<td>50 GB</td>
+<td>BD-R DL、BD-RE DL</td>
+<td align="right">46.6 GiB</td>
+</tr>
+<tr>
+<td>100 GB</td>
+<td>BD-R TL、BD-RE TL</td>
+<td align="right">93.1 GiB</td>
+</tr>
+<tr>
+<td>128 GB</td>
+<td>主要是 BD-R QL；BD-RE QL 须查具体产品</td>
+<td align="right">119.2 GiB</td>
+</tr>
+</tbody></table></div>
+<p>小尺寸和双面盘也曾使用：Mini CD 约 215～310 MB；Mini DVD 单面可为 1.46 GB 或 2.66 GB；Mini BD-R 约 7.8 GB。标准直径的双面单层 DVD 为 9.4 GB，双面双层约 17 GB；部分 DVD-RAM 需要翻面。旧款 CD 还常见 650 MB。小盘须确认光驱托盘能固定 8 cm 介质，双面盘须分清每一面的容量。企业级双面 BD 有约 200 GB 和更高容量方案，不能拿来推断消费级 BDXL 光驱的能力。</p>
+<p>GB 按十进制计算（10⁹ 字节），GiB 按二进制计算（2³⁰ 字节）。文件系统、备用区和会话也占空间。写盘前用 ImgBurn Disc Information 核对 Profile、容量、层数、速度和 MID；光驱须支持对应的 <code>+</code>／<code>-</code>、RAM、双层或 BDXL 写入能力。</p>
+<p>不同盘型的倍率不能直接比较。4× 的数据率约为 CD 0.6 MB/s、DVD 5.54 MB/s、BD 18 MB/s。DVD M-DISC 需要光驱提供相应写入策略；BD M-DISC 通常按对应容量的 BD-R 写入，但仍应核对光驱的可写 Profile 和兼容表。常见 BD-RE 零售盘多为 2× 写入，具体速度以实盘和光驱报告为准。</p>
+<h3 id="section-7">1.2 续写、覆写和重写<a class="heading-anchor" href="#section-7" aria-label="本节链接">#</a></h3>
+<p>DVD-R、DVD+R、BD-R 的已写区域无法擦除。有剩余空间时，可以追加文件或将同名新版写在新位置，但旧版仍占空间。DVD±RW、BD-RE 可擦除和覆写；编辑器能否直接保存，还要看记录模式、UDF 布局、系统和软件。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<figure class="guide-diagram"><img src="assets/diagrams/write-behavior.svg" alt="一次写入盘在新位置写同名新版并保留旧扇区；可擦写盘可在相应区域重新写入" loading="lazy"><figcaption>“文件名被替换”描述的是当前目录，不代表旧数据在物理盘面上被抹掉。</figcaption></figure>
+
+<p>BD-RE、DVD-RW 往往比对应的 <code>R</code> 盘慢。它们的相变记录层需要在晶态和非晶态之间反复切换，写入功率与脉冲也要兼顾多次使用。一次写入盘只需形成稳定的记录标记，因此厂商可以采用不同的高速写入策略。慢速盘的质量仍要靠写后读回来判断。</p>
+<p>盘片主要用聚碳酸酯作基板；记录层、反射层、涂层、胶合和制造公差也影响可读性。BD 有更强的纠错设计，但不能弥补所有制造或写入缺陷。</p>
+<p><code>DVD-R</code> 是 Pioneer 主导的 DVD Forum 路线，<code>DVD+R</code> 由 Sony、Philips 等推动的联盟发展；早期固件和播放器对两者的支持有别。部分刻录机可把 <code>DVD+R/+RW</code> 的 <code>Book Type</code> 设为 <code>DVD-ROM</code>，供旧播放器识别，但盘片仍是加号格式。给老设备用盘，应按具体 MID 试刻、试读；双层 DVD 还要检查跨层位置。</p>
+<h3 id="section-8">1.3 染料、相变层、HTL／LTH、M-DISC<a class="heading-anchor" href="#section-8" aria-label="本节链接">#</a></h3>
+<p>普通 CD-R、DVD±R 多用有机染料。酞菁、花青和偶氮（AZO）是不同染料；CD-R 的金、银或合金反射层又是另一层结构。三菱／威宝的 AZO 标识有助于辨认系列，却不说明完整配方或寿命。没有厂商材料说明，不能凭“金盘”名称、MID 或盘底颜色鉴定成分。</p>
+<p>BD-R 的 HTL（High to Low）与 LTH（Low to High）表示刻后反射率的变化方向。HTL 常用无机材料，LTH 通常用有机染料；这与 UDF 版本、可擦写性无关。威宝的 <code>VERBAT IMe</code> 与 <code>VERBAT IMu</code> 同为 25 GB、1～6×，却分别是 HTL、LTH。可在 ImgBurn 中查看 <code>Recorded Mark Polarity</code>，并用 MID 名录核对。<a class="source-ref" href="#source-s2" aria-label="资料 S2">[S2]</a></p>
+<p>Juri 的<a href="http://juri.su/lthhtl.htm">户外对照</a>比较了威宝 <code>43751 / VERBAT IMu</code>（LTH，盘片标为 2011 年）与 <code>43742 / VERBAT IMe</code>（HTL，标为 2016 年）。两盘于 <strong>2021 年 3 月 31 日</strong>由 Pioneer BDR-211UBK 以 2× 写入，放在朝西南的室外窗台；之后每月用 LG BH16NS40 以 7× 扫描。189 天后的 10 月 6 日，两盘退化速度相近且都通过读取测试。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a> 标注年份不是刻录年份，空白盘存放时间也不同。这项双盘实验无法给 HTL、LTH 排寿命；普通备份可优先考虑 HTL，并检验到手批次。</p>
+<p>DVD M-DISC 主打耐久的无机记录层，需要刻录机提供相应写入策略。BD-R 本来就有无机 HTL 盘，BD M-DISC 是其中的品牌系列，材料和寿命宣传不能直接沿用 DVD 版。Juri 的<a href="http://juri.su/mdisc.htm">样本目录</a>列有 RITEK <code>MDDVD47 / MILLENIA 001</code>、2014 年 RITEK <code>MDBD25 / MILLEN MR1</code>，以及 2016 年威宝 <code>DBR50RMDPV1 / VERBAT IMf</code>、<code>DBR100YMDPV1 / VERBAT IMk</code>。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a> 同一商标涵盖不同容量和 MID，代码也不证明记录层相同；“只有三四家厂生产”缺少逐型号依据。</p>
+<h3 id="section-9">1.4 保存寿命、材料标识与存放条件<a class="heading-anchor" href="#section-9" aria-label="本节链接">#</a></h3>
+<p>加拿大文物保护研究所（CCI）的参考寿命表按材料和特定温湿度研究给出范围，<strong>未计入空气污染物</strong>；非金反射层在污染环境中可能更早失效。年数不能直接套到某个品牌或批次。<a class="source-ref" href="#source-s13" aria-label="资料 S13">[S13]</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>参考年限</th>
+<th>CCI 表中的介质及材料</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>超过 100 年</td>
+<td>酞菁染料＋金反射层 CD-R</td>
+</tr>
+<tr>
+<td>50～100 年</td>
+<td>酞菁染料＋银合金反射层 CD-R；金反射层 DVD-R；只读 CD</td>
+</tr>
+<tr>
+<td>20～50 年</td>
+<td>CD-RW；BD-RE；银合金反射层 DVD+R；花青或偶氮染料＋银合金反射层 CD-R；DVD+RW</td>
+</tr>
+<tr>
+<td>10～20 年</td>
+<td>无染料＋金反射层 BD-R；银合金反射层 DVD-R；只读 DVD／BD</td>
+</tr>
+<tr>
+<td>5～10 年</td>
+<td>染料或无染料、单层或双层 BD-R；DVD-RW；DVD+R DL</td>
+</tr>
+</tbody></table></div>
+<p>CCI 建议存放于相对湿度 20%～50%、温度 −10～23°C，避免超过 32°C；这是保存建议，<strong>不是表中统一的测试条件</strong>。家中应避开日晒、暖气、潮湿和灰尘，独立入盒，定期读盘。<a class="source-ref" href="#source-s13" aria-label="资料 S13">[S13]</a></p>
+<p>BD-R 在表中落入不同范围，取决于记录层、反射层等材料。纠错和缺陷管理也影响可读性，多层、可擦写盘还对读盘设备有额外要求。短期扫描或单盘暴露试验无法给所有 HTL、LTH 或产地排出寿命顺序。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a><a class="source-ref" href="#source-s13" aria-label="资料 S13">[S13]</a></p>
+<p>“Archival”“Gold”“Medical”“M-DISC”“Hard Coat”可能指材料、涂层或产品系列，须查厂商说明。ISO/IEC 16963 加速老化测试比较设定条件下的样本失效趋势，不能保证单张盘的可读年数。可按公开的染料、反射层和测试条件比较专业盘；普通零售盘若缺少材料声明，就记录商品号与批次，读回校验并留第二副本。</p>
+<p>外观可留下批次线索，不能用来鉴定材料。BD-R 和 BD-RE 的记录层与堆叠结构不同，盘底可能分别呈金棕色、黑紫色等颜色。标准 12 cm CD／DVD／BD 的名义厚度都在约 1.2 mm 量级。边缘、标签和公差会影响手感，凭厚薄不能判定工厂或寿命。</p>
+<p>桶装盘沿中心轴叠放，取盘时避免让一张盘的记录面在另一张盘面上滑动。已刻好的归档盘可放进独立珍宝盒，详细信息写在盒子上。若要在盘面标记，只在厂商允许的区域使用合适的软头笔；厚标签可能影响转动平衡。</p>
+<h3 id="section-10">1.5 MID 与盘片批次<a class="heading-anchor" href="#section-10" aria-label="本节链接">#</a></h3>
+<p>MID 是介质控制信息中的制造商／类型代码，光驱固件据此选择写入策略。它不等于商标、工厂、材料或批次质量。追溯盘片时，应连同商品号、包装上的产地与厂商声明、内圈码、卖家、购买日期及刻录日志一起记录。<a class="source-ref" href="#source-s2" aria-label="资料 S2">[S2]</a><a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a></p>
+<p>蓝光协会的<a href="https://blu-raydisc.info/licensee-list/discmanuid-licenseelist.php">MID 名录</a>按 BD-R 层数、BD-RE 等盘型列出授权代码和标称速度，供辨认代码，不评价零售盘质量。<a class="source-ref" href="#source-s2" aria-label="资料 S2">[S2]</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>MID 前段</th>
+<th>名录中的盘型与速度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>VERBAT-IMe</code>／<code>VERBAT-IMu</code></td>
+<td>25 GB BD-R，1～6×；分别为 HTL、LTH</td>
+</tr>
+<tr>
+<td><code>VERBAT-IMf</code>／<code>VERBAT-IMk</code></td>
+<td>50 GB BD-R DL、100 GB BD-R TL；均为 HTL</td>
+</tr>
+<tr>
+<td><code>RITEK-BR2</code>／<code>RITEK-BR3</code></td>
+<td>25 GB BD-R HTL；分别为 1～4×、1～6×</td>
+</tr>
+<tr>
+<td><code>RITEK-BO1</code>／<code>RITEK-BO2</code></td>
+<td>25 GB BD-R LTH；分别为 1～4×、1～6×</td>
+</tr>
+<tr>
+<td><code>RITEK-DR3</code>／<code>CMCMAG-CN2</code></td>
+<td>50 GB BD-R DL HTL；25 GB BD-RE 2×</td>
+</tr>
+</tbody></table></div>
+<p>这些数字标识盘型或速度代际，不是质量等级；BD-R 与 BD-RE 的误码或寿命也不能直接对比。</p>
+<p>名录把 <code>VERBAT IMe</code> 同时列在 CMC Magnetics 和 Mitsubishi Chemical Media 名下。<a href="https://ez647.sk/mitsubishi_kagaku/verbatime000bdr.html">ez647 的 2011 年 Verbatim 43714 样本</a>读到 <code>VERBAT-IMe-000</code>，内圈码为 <code>ZE4635-MK-BX6A031</code>，并标为台湾 CMC 制造。手中 <code>43714</code> 若有同样内圈码，比共用的 MID 更能指向该生产线；包装上的三菱商标声明仅说明商标权属。精确批次仍可向厂商核实。<a class="source-ref" href="#source-s2" aria-label="资料 S2">[S2]</a><a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a></p>
+<figure class="guide-diagram"><img src="assets/diagrams/mid-evidence.svg" alt="辨认盘片批次应合并商品号、包装声明、MID 极性与内圈码，再记录刻录和读回结果" loading="lazy"><figcaption>MID 是识别线索之一。要追溯到手的盘，还需保存包装和批次资料。</figcaption></figure>
+
+<p>BD 扫描常看 LDC（长距离码错误）和 BIS（Burst Indicator 子码错误）；DVD 常看 PI Errors、PIF（PI Failure）和 jitter（时基抖动）。扫描曲线可以找出错误突然升高的区域，但同一张盘换光驱、固件或扫描速度，数值都可能变化。要确认备份当前可用，还应完整读回、比较文件哈希，并在一段时间后复查。<a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a><a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<h3 id="section-11">1.6 质量扫描的时间与设备条件<a class="heading-anchor" href="#section-11" aria-label="本节链接">#</a></h3>
+<p>Juri 的 <a href="http://juri.su/bdrtest.htm">BD-R 测试表</a>列有照片、扫描图、平均／最大 LDC 与 BIS、抖动、写速和 <code>Data</code> 日期。其中三张 <code>CMCMAG BA5</code> 25 GB 盘的数据是：<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>样本及盘片年份</th>
+<th><code>Data</code> 栏日期</th>
+<th align="right">表中写速</th>
+<th align="right">平均 LDC</th>
+<th align="right">平均 BIS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Verbatim <code>43840</code>，盘片标为 2016 年</td>
+<td>2020-02-29</td>
+<td align="right">3×</td>
+<td align="right">10.47</td>
+<td align="right">0.15</td>
+</tr>
+<tr>
+<td>Verbatim <code>43804</code>，盘片标为 2016 年</td>
+<td>2018-01-27</td>
+<td align="right">6×</td>
+<td align="right">21.86</td>
+<td align="right">0.36</td>
+</tr>
+<tr>
+<td>CMC <code>BDR25</code>，盘片标为 2016 年</td>
+<td>2019-02-17</td>
+<td align="right">6×</td>
+<td align="right">74.20</td>
+<td align="right">1.02</td>
+</tr>
+</tbody></table></div>
+<p>同一 MID 的三张盘数值差距明显，但写速、批次不同，<code>Data</code> 也未区分刻录日和扫描日，不能由“2016 年盘片”推算写后存放年数。原页所列刻录机为 Pioneer BDR-S09XLT；2017 年 5 月后主要用刷 WH16NS58 固件的 LG BH16NS40(NS51) 测试，更早还用过 ASUS BC-08B1ST。自行比较时要固定扫描机、固件及扫描速度，观察曲线在哪个盘面位置升高；低误码只表示当次读回余量较好，不能换算寿命。恢复资料仍以完整读回和文件校验为准。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<p>ez647 的 <a href="https://ez647.sk/ritek/ritekbr2000_bdr.html">Imation <code>RITEK-BR2</code> 样本</a>于 2011-04-24 刻录并通过首次读取，2012-05-13 复测已无法读文件，间隔 <strong>385 天</strong>。<a href="https://ez647.sk/mitsubishi_kagaku/verbatime000bdr.html">Verbatim <code>43714 / VERBAT IMe</code></a>标注 2011-04-23 刻录、当日测试及 2012-05-13 复测，但未列出更久后的状态。<a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a> 讨论写后变化，须分清盘片年份、刻录日和复测日；单次扫描只说明当时的状况。</p>
+<h2 id="section-12">二、光驱的读写能力<a class="heading-anchor" href="#section-12" aria-label="本节链接">#</a></h2>
+<h3 id="section-13">2.1 机芯尺寸与连接方式<a class="heading-anchor" href="#section-13" aria-label="本节链接">#</a></h3>
+<p>光驱按机芯可分为 5.25 英寸厚机和约 9／12 mm 的薄机；外置 USB 产品则可能装着其中任一种。厚机通常更适合连续刻录和多层盘。薄机写单层盘也够用，实际表现还看供电、散热、固件和盘片。</p>
+<div class="figure-grid figure-grid-photos" aria-label="厚薄机和内外置光驱照片"><figure><img src="assets/figures/pdf-00.png" alt="台式厚机与笔记本薄型内置机芯" loading="lazy"><figcaption>两种内置机芯</figcaption></figure><figure><img src="assets/figures/pdf-01.png" alt="厚机外置盒与薄型 USB 外置光驱" loading="lazy"><figcaption>两种外置形态</figcaption></figure></div>
+
+<h3 id="section-14">2.2 面板标志与实际 Profile<a class="heading-anchor" href="#section-14" aria-label="本节链接">#</a></h3>
+<p>“蓝光刻录机”有时只能写 25／50 GB BD，有些还能写 BDXL。查看完整型号、硬件修订、固件、连接方式和设备的 <code>Profiles</code>，分别确认 DVD±R／DL／RAM、BD-R DL 及各层 BDXL 的写入能力。ImgBurn 报告 <code>Found 1 BD-RE XL</code> 只说明发现相关 Profile，不能推及所有 XL 盘型。读取 UHD 电影盘、商业软件的 AACS 2.x 播放链，以及质量扫描所需的厂商命令，也各要单独验证。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<p>外置盒增加一道 USB 桥接。若软件认出内部 <code>ASUS BW-16D1HT</code>，却报告 USB 2.0，应查 Windows 设备树的协商速度、盒体规格和连续读取曲线。只换电脑接口未必改变桥接方式，USB 2.0 也可能限制高倍速 BD 读写。</p>
+<p>面板上的 <code>CD-RW</code>、<code>DVD Multi Recorder</code>、<code>BD-RE</code> 通常提示写入能力；<code>DVD-ROM</code>、<code>DVD Multi Player</code>、<code>BD-ROM</code> 提示读取能力。<code>BD Combo</code> 通常刻 CD／DVD、只读 BD，刷固件也无法增添 BD 写入硬件。方框式 <code>RW</code> 是 DVD 加号格式标志；CD-RW 的 High Speed／Ultra Speed 表示速度类别。面板可能被替换，仍须核对 Profile。</p>
+<div class="figure-grid" aria-label=" CD 与 DVD 面板标志"><figure><img src="assets/figures/pdf-02.png" alt="Compact Disc 标志" loading="lazy"><figcaption>CD</figcaption></figure><figure><img src="assets/figures/pdf-03.png" alt="CD ReWritable 标志" loading="lazy"><figcaption>CD-RW</figcaption></figure><figure><img src="assets/figures/pdf-04.png" alt="CD-RW Ultra Speed Plus 标志" loading="lazy"><figcaption>CD-RW Ultra Speed+</figcaption></figure><figure><img src="assets/figures/pdf-05.png" alt="DVD-ROM 标志" loading="lazy"><figcaption>DVD-ROM</figcaption></figure><figure><img src="assets/figures/pdf-06.png" alt="DVD Multi Recorder 标志" loading="lazy"><figcaption>DVD Multi Recorder</figcaption></figure><figure><img src="assets/figures/pdf-07.png" alt="DVD Multi Player 标志" loading="lazy"><figcaption>DVD Multi Player</figcaption></figure><figure><img src="assets/figures/pdf-08.png" alt="DVD 加号格式联盟标志" loading="lazy"><figcaption>DVD+R DL</figcaption></figure><figure><img src="assets/figures/pdf-09.png" alt="DVD 加号可擦写格式标志" loading="lazy"><figcaption>DVD+RW</figcaption></figure></div>
+
+<p>DVD M-DISC 标志提示光驱为原始 DVD M-DISC 准备了写入策略。HD DVD 曾与 BD 竞争，如今介质和设备都少见。<code>Blu-ray Disc</code> 表示蓝光家族，<code>BDXL</code> 对应三层或四层的大容量盘，<code>Ultra HD Blu-ray</code> 则涉及电影播放规范。选购时应分别核对 BDXL 的读写 Profile，以及商业 UHD 播放所需的软件和 AACS 条件。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<div class="figure-grid" aria-label="其他介质标志"><figure><img src="assets/figures/pdf-10.png" alt="纵向 M-DISC 标志" loading="lazy"><figcaption>M-DISC 纵向</figcaption></figure><figure><img src="assets/figures/pdf-11.png" alt="横向 M-DISC 标志" loading="lazy"><figcaption>M-DISC 横向</figcaption></figure><figure><img src="assets/figures/pdf-12.png" alt="HD DVD 标志" loading="lazy"><figcaption>HD DVD</figcaption></figure><figure><img src="assets/figures/pdf-13.png" alt="Blu-ray Disc 标志" loading="lazy"><figcaption>Blu-ray Disc</figcaption></figure><figure><img src="assets/figures/pdf-14.jpg" alt="BDXL 标志" loading="lazy"><figcaption>BDXL</figcaption></figure><figure><img src="assets/figures/pdf-15.png" alt="Ultra HD Blu-ray 标志" loading="lazy"><figcaption>Ultra HD Blu-ray</figcaption></figure></div>
+
+<p>华硕 E-GREEN 涉及电源／静音管理，明基 SolidBurn 尝试为未知盘片优化写入策略。LightScribe 和 LabelFlash 曾用激光在特定盘面上刻印标签。这些标志与数据面的纠错能力或保存年限无关。</p>
+<div class="figure-grid" aria-label="厂商功能标志"><figure><img src="assets/figures/pdf-16.png" alt="ASUS E-GREEN 标志" loading="lazy"><figcaption>E-GREEN</figcaption></figure><figure><img src="assets/figures/pdf-17.png" alt="BenQ SolidBurn 标志" loading="lazy"><figcaption>SolidBurn</figcaption></figure><figure><img src="assets/figures/pdf-18.png" alt="LightScribe 标志" loading="lazy"><figcaption>LightScribe</figcaption></figure><figure><img src="assets/figures/pdf-19.png" alt="LabelFlash 标志" loading="lazy"><figcaption>LabelFlash</figcaption></figure></div>
+
+<h3 id="section-15">2.3 光驱类型与可写盘型<a class="heading-anchor" href="#section-15" aria-label="本节链接">#</a></h3>
+<p><code>CD-ROM</code>、<code>DVD-ROM</code> 是只读机；<code>CD-RW</code> 可写 CD，<code>DVD-RW／DVD±RW</code> 通常可写 CD 和 DVD。<code>BD-ROM</code> 以只读 BD 为主，通常不刻 CD／DVD；<code>BD Combo</code> 通常读 BD、刻 CD／DVD；<code>BD-RE</code> 刻录机还能写 BD。</p>
+<p>标称 BDXL 的 Combo 机可能只读 XL，BD 刻录机也未必能写每种 XL 盘。DVD±R DL、DVD-RAM、BD-RE TL 等细项都要查各自的读写 Profile。</p>
+<p>某些刻录机支持将 <code>DVD+R/+RW</code> 的 <code>Book Type</code> 设为 <code>DVD-ROM</code>，改善旧播放器识别；盘仍是加号格式。播放还取决于文件系统和 DVD-Video 结构。</p>
+<h3 id="section-16">2.4 历代代表机型<a class="heading-anchor" href="#section-16" aria-label="本节链接">#</a></h3>
+<p>从 CD 到 BD 的代表型号包括：CD 时代的 Plextor Premium、Yamaha CRW-F1；DVD 时代的 Plextor PX-716A／PX-760A、BenQ DW1620／DW1640／DW1650、Pioneer DVR-111、Sony Optiarc AD-7280S／TEAC DV-W5500S；BD 时代的 Pioneer BDR-S13J-X／BDR-213JBK、Lite-On iHBS112／212／312、HLDS WH16NS60。今天购买 CD／DVD 时代老机时，激光器、皮带、主轴和电容的状态比旧日口碑更重要。OEM 机芯、产线和主控也可能随硬件修订改变。</p>
+<h3 id="section-17">2.5 光驱寿命与写入速度<a class="heading-anchor" href="#section-17" aria-label="本节链接">#</a></h3>
+<p>消费光驱通常没有可靠的“最多刻多少张”额定值。激光器、机械件、积尘、散热和供电都会影响寿命。可记录同一 MID、同一速度下的失败率、Verify 及读取曲线：只有一张旧盘难读，先查盘；多种良盘均出错，再查光驱。</p>
+<p>固件只为部分盘片和速度组合准备写入策略。现代 16× DVD 强制降到极低速度可能更差。新批次先选双方支持的中档速度试刻，保留日志，Verify、重插读回。比较写速时，扫描机和扫描速度要固定。<a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a></p>
+<h3 id="section-18">2.6 UHD Friendly、官方 UHD、LibreDrive 与刷机<a class="heading-anchor" href="#section-18" aria-label="本节链接">#</a></h3>
+<p>MakeMKV 社区把能借助相应固件读取 UHD 光盘原始数据、但不属于官方 UHD 播放链的部分机型称为 <strong>UHD Friendly</strong>；<code>WH16NS60</code>、<code>BU40N</code> 等被列在 <strong>Official</strong> 路线。<strong>LibreDrive</strong> 是 MakeMKV 显示的原始访问能力状态，不是机型标志。即使刷入 Official 路线固件，PowerDVD 等商业播放器所需的 AACS 2.x 资格也不会自动出现。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<p><a href="https://forum.makemkv.com/forum/viewtopic.php?f=16&t=19634">MakeMKV 社区指南</a>列出的部分机芯如下。目标固件是社区读取方案，并非厂商升级建议。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>机芯</th>
+<th>类别</th>
+<th>指南所列固件及条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ASUS <code>BW-16D1HT</code>／<code>BW-16D1HT Pro</code>，5.25 英寸</td>
+<td>Friendly</td>
+<td><code>BW-16D1HT 3.10MK</code>；外置 <code>BW-16D1H-U</code> 须先查内部机芯</td>
+</tr>
+<tr>
+<td>LG <code>WH14NS40</code>、<code>WH16NS40</code>、<code>BH16NS55</code>，5.25 英寸</td>
+<td>Friendly</td>
+<td>符合平台、服务码条件者：<code>WH16NS60 1.02MK</code>；跨型号须核对硬件</td>
+</tr>
+<tr>
+<td>LG <code>WH16NS60</code>，5.25 英寸</td>
+<td>Official</td>
+<td><code>WH16NS60 1.02MK</code></td>
+</tr>
+<tr>
+<td>LG <code>BU40N</code>，9.5 mm 薄机</td>
+<td>Official</td>
+<td><code>BU40N 1.03MK</code>；不可用台式机固件</td>
+</tr>
+<tr>
+<td>LG <code>BP60NB10</code>、<code>BP50NB40</code>，USB 薄机</td>
+<td>Official／“Officialish”</td>
+<td><code>BP60NB10 1.02MK</code>；<code>BP50NB40</code> 限指定 <code>NB50/52</code>，<code>NB72</code> 不支持该方案</td>
+</tr>
+<tr>
+<td>Pioneer <code>BDR-XD08UMB-S</code>、<code>BDR-S12UHT</code>、<code>BDR-S13UBK</code> 等</td>
+<td>社区可用机型</td>
+<td>新固件可能阻止跨刷；须核对型号及当前版本</td>
+</tr>
+</tbody></table></div>
+<p>LG／ASUS MediaTek 机芯须看机身生产时期（通常 2016 年之后）、MakeMKV 的 <code>Drive Platform: MT1959</code>，以及 LG 的 <code>SVC NS50</code> 或更新服务码；薄机核对 <code>NB50</code> 或更新。ASUS <code>BW-16D1HT 3.11</code>、LG <code>WH16NS40-NS50 1.05</code> 等较新 OEM 固件可能加密，降级检查不同于早期固件。USB 桥接器也可能不传递刷写命令。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<p>部分 Friendly 机芯有 <em>sleep bug</em>：UHD 盘闲置约两分钟后可能停读，需弹出再关入。兼容的 Official 路线固件可规避此问题，但台式机与薄机不可互刷；某些 ASUS／LG 跨家族固件还会使光驱失去刻录能力。刷机也不会取得商业软件所需的 AACS 2 资格。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<p><code>BW-16D1HT</code> 若报告 <code>MT1959</code>、<code>LibreDrive 已启用</code>、<code>BD 原始数据读取：是</code>，MakeMKV 的原始读取路径已可用。要判断 <code>3.10</code> 是否为 <code>3.10MK</code>，还要看“固件类型”的补丁说明。功能已经满足需求，就无须再跨刷。</p>
+<p>准备刷写前，保存自己的 Drive Information、固件版本和能由工具读出的固件备份，记录 SHA-256，再确认目标文件与硬件平台、机芯厚薄和固件家族对应。从网上下载同版本 <code>.bin</code> 不等于读出了自己光驱的身份或校准数据；能备份哪些区域由机芯和工具决定。刷完先读一张已知良盘；还要刻一张可牺牲盘并 Verify，确认写入能力没有受影响。社区指南目前提到 SDF GUI 及加密固件检测，但工具的防错检查不能代替逐项核对。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<h3 id="section-19">2.7 Disc Information 与质量扫描<a class="heading-anchor" href="#section-19" aria-label="本节链接">#</a></h3>
+<p>ImgBurn 的 Disc Information 显示盘的空白／完整状态、会话、MID、可用速度、BD 层数与记录极性；Verify 则读回刚写的数据。Opti Drive Control 的 Disc Quality 还要求光驱支持相应厂商扫描命令。遇到 <code>No suitable disc inserted</code>，先看盘上是否已有数据，再查介质、驱动器与插件是否受支持。选择“ASUS 插件”或刷入补丁，并不会给光驱增加原本没有的扫描能力。<code>Create Test Disc</code> 会写入测试数据，只适合可牺牲的空白盘。已写好的档案盘可做非破坏性读取或扫描，最终仍须逐文件校验。</p>
+<h2 id="section-20">三、文件系统与写入方式<a class="heading-anchor" href="#section-20" aria-label="本节链接">#</a></h2>
+<p>光驱认识 <code>BD-R</code> 或 <code>DVD-R</code>，只表示它能读扇区。资源管理器还要找到会话和文件系统，才能列出文件。因此，已占容量的盘仍可能看不到文件；资源管理器显示的目录，也可能与旧会话中的目录不同。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a><a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<h3 id="section-21">3.1 物理盘片、会话与文件目录<a class="heading-anchor" href="#section-21" aria-label="本节链接">#</a></h3>
+<div class="layers" role="img" aria-label="从下到上依次是盘片物理类型、记录模式、会话和轨道、文件系统、用户文件或影片规范">
+  <div><b>⑤ 用户内容</b><span>文件、启动结构、DVD-Video／BD-Video</span></div>
+  <div><b>④ 文件系统</b><span>ISO 9660、Joliet、Rock Ridge、UDF</span></div>
+  <div><b>③ 会话与轨道</b><span>目录在第几批写入、是否导入先前内容</span></div>
+  <div><b>② 记录模式</b><span>顺序写入、受限覆写、BD-R 伪覆写等</span></div>
+  <div><b>① 物理介质</b><span>DVD-R、DVD-RW、BD-R、BD-RE；单层或多层</span></div>
+</div>
+
+<p>例如，Windows Live 先在 DVD-R 上建立 UDF。随后复制或修改 <code>hello.txt</code>，系统可写入新数据和目录，让当前文件名指向新版；旧扇区仍留在盘上。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<h3 id="section-22">3.2 ISO 9660、Joliet 与 UDF<a class="heading-anchor" href="#section-22" aria-label="本节链接">#</a></h3>
+<p>文件系统记录文件名、目录与扇区位置。ISO 9660 于 1988 年面向 CD-ROM 发布；保守的 Level 1 常见 8.3 文件名和浅目录。Joliet 扩展 Windows 的 Unicode 文件名，Rock Ridge 保存 Unix 权限、符号链接等信息。同一盘可有多套目录视图，旧设备可能只认基础 ISO 名称。El Torito 规定 BIOS／部分 UEFI 如何找到启动映像，但有 El Torito 目录也不保证镜像可启动。ISO 13490 于 1990 年代中期补充可记录、多会话盘的卷结构；ISO 9660 本身并不禁止多会话。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a><a class="source-ref" href="#source-s11" aria-label="资料 S11">[S11]</a></p>
+<p>不少 ISO 9660／Joliet 组合对单文件有约 4 GiB 限制。ISO 9660 Level 3 的多段文件可越过限制，前提是刻录和读取软件都支持。大文件数据盘通常选目标设备认识的 UDF；<code>.iso</code> 后缀本身不决定大小上限。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a></p>
+<p>UDF（Universal Disk Format）也在 1990 年代中期出现，面向更大的文件和可记录介质。主要修订如下：<a class="source-ref" href="#source-s11" aria-label="资料 S11">[S11]</a><a class="source-ref" href="#source-s12" aria-label="资料 S12">[S12]</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>修订版</th>
+<th>增加的能力与常见用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1.02（1996）</td>
+<td>DVD-Video 的基础版本；也用于保守的数据盘</td>
+</tr>
+<tr>
+<td>1.50（1997）</td>
+<td>VAT 为一次写入盘提供更新后的目录视图；备用表用于缺陷管理</td>
+</tr>
+<tr>
+<td>2.00（1998）／2.01（2000）</td>
+<td>流、访问控制及实时记录结构；2.01 澄清修订</td>
+</tr>
+<tr>
+<td>2.50（2003）</td>
+<td>元数据分区及镜像；BD-Video 常用</td>
+</tr>
+<tr>
+<td>2.60（2005）</td>
+<td>支持适用于 BD-R 的伪覆写</td>
+</tr>
+</tbody></table></div>
+<p>UDF 版本不决定能否直接改文件，也不保证长期保存。一次写入盘的旧扇区不会因 VAT 或伪覆写而空出来。跨软件续写还取决于会话导入、记录模式和驱动器；Windows 使用的 UDF 版本也随系统、盘型及写法变化。</p>
+<figure class="guide-diagram"><img src="assets/diagrams/udf-history.svg" alt="UDF 1.02、1.50、2.01、2.50 与 2.60 的时间顺序和典型用途" loading="lazy"><figcaption>常见 UDF 修订版的发布时间与用途。</figcaption></figure>
+
+<p>刻录软件可把 ISO 9660、Joliet、UDF 写在同一盘上。各目录对长文件名、大文件、特殊字符的处理可能不同，需在目标设备核对。现代 Windows、Linux、macOS 通常能读 UDF 数据盘；旧车机、播放器和系统须查具体版本。DVD-Video、BD-Video 则遵守各自的制作规范。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a><a class="source-ref" href="#source-s11" aria-label="资料 S11">[S11]</a><a class="source-ref" href="#source-s12" aria-label="资料 S12">[S12]</a></p>
+<p>一般数据盘可参考：CD 用 Joliet 或 UDF 1.50，DVD 用 UDF 1.50／2.01，BD 用 UDF 2.50；DVD-Video 用 1.02，BD-Video 用 2.50，BD-R 伪覆写才涉及 2.60。给旧设备用时，以该设备的实际支持为准。直接改文件还要求合适的盘型和写入模式。</p>
+<p>检查兼容性要过四关：光驱认识盘型和层数；系统找到会话；系统挂载文件系统；应用程序理解内容。数据 DVD 上的 <code>movie.mkv</code> 可在电脑浏览，旧 DVD 播放机却可能无法播放。VLC 选择“打开蓝光光盘”会按播放列表寻找影片，普通“打开文件”可能选错主片；商业 UHD 还涉及加密和导航。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a></p>
+<figure class="guide-diagram"><img src="assets/diagrams/compatibility-gates.svg" alt="从光驱识别盘型，到读取会话、挂载文件系统、应用软件理解内容的四道兼容性检查" loading="lazy"><figcaption>四步分别对应介质、会话、文件系统和应用格式。</figcaption></figure>
+
+<h3 id="section-23">3.3 ISO 镜像与普通文件<a class="heading-anchor" href="#section-23" aria-label="本节链接">#</a></h3>
+<p>ISO 镜像保存已排好的盘面，可能包含 ISO 9660、UDF、El Torito 启动信息等结构；ISO 9660 本身是文件系统规范。ImgBurn 的 <code>Write image file to disc</code> 原样写镜像，<code>Write files/folders to disc</code> 则从文件新建盘面。把 <code>linuxmint.iso</code> 拖进数据盘只会得到一个文件；解压后再 Build 也可能丢失启动结构。<a class="source-ref" href="#source-s6" aria-label="资料 S6">[S6]</a></p>
+<figure class="guide-diagram"><img src="assets/diagrams/image-vs-build.svg" alt="ImgBurn 写入已有 ISO 镜像和从普通文件构建数据光盘的两条不同流程" loading="lazy"><figcaption>制作安装盘选上方的镜像路线；归档普通文件选下方的文件路线。</figcaption></figure>
+
+<p><code>BIN/CUE</code>、<code>IMG</code> 可能保存原始扇区或特殊轨道布局。普通 ISO 常为 <code>MODE1/2048</code>，原始映像可为 <code>MODE1/2352</code>；扩展名无法确定扇区长度，应看 CUE 和软件识别结果。复制普通数据盘无需把物理纠错字节另当文件写入。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a></p>
+<h3 id="section-24">3.4 扇区布局与纠错<a class="heading-anchor" href="#section-24" aria-label="本节链接">#</a></h3>
+<p>CD 扇区主通道为 2352 字节，各模式留给应用的数据量不同：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>结构</th>
+<th align="right">应用数据／扇区</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CD-DA</td>
+<td align="right">2352 字节音频采样</td>
+<td>音频轨道和索引；有 CIRC 纠错及错误隐藏</td>
+</tr>
+<tr>
+<td>CD-ROM Mode 1</td>
+<td align="right">2048 字节</td>
+<td>普通数据 CD，另有 EDC／ECC</td>
+</tr>
+<tr>
+<td>CD-ROM Mode 2</td>
+<td align="right">可留更多主通道空间</td>
+<td>基本模式；后续 XA 分为 Form 1／2</td>
+</tr>
+<tr>
+<td>XA Mode 2 Form 1</td>
+<td align="right">2048 字节</td>
+<td>重视纠错的计算机文件</td>
+</tr>
+<tr>
+<td>XA Mode 2 Form 2</td>
+<td align="right">2324 字节</td>
+<td>VCD 视频流，以较少纠错冗余换容量</td>
+</tr>
+</tbody></table></div>
+<p>VCD 的目录和导航仍用 ISO 9660；Form 2 视频流也并非没有错误检测。CD-DA 按轨道而非文件目录组织音频。DVD、BD 通常每扇区有 2048 字节用户数据；DVD 的 ECC 块为 16 扇区、32 KiB，BD 相应单元为 32 扇区、64 KiB，采用 LDC／BIS 机制。扫描曲线还受光驱、速度和盘况影响。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<h3 id="section-25">3.5 Windows 的 Live 与 Mastered<a class="heading-anchor" href="#section-25" aria-label="本节链接">#</a></h3>
+<p>Windows 的“像 U 盘一样使用”（Live File System）先建立 UDF，复制文件时逐步写盘。DVD-R 上保存同名新版，系统可能在新位置追加数据和目录，旧扇区仍占空间。DVD-R 没有 BD-R 的 Pseudo Overwrite（伪覆写）；BD-R 的这项机制需要介质、光驱和 UDF 2.60 布局配合，也不会回收旧扇区。DVD-RW 的 restricted overwrite 等模式则可重写相应区域。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a><a class="source-ref" href="#source-s11" aria-label="资料 S11">[S11]</a><a class="source-ref" href="#source-s12" aria-label="资料 S12">[S12]</a></p>
+<p>“与 CD/DVD 播放器一起使用”（Mastered）先把文件放进“准备好写入光盘中的文件”，点击“刻录到光盘”才写入。待刻录区的 <code>desktop.ini</code> 多半是文件夹视图元数据。已刻文件不能直接在编辑器保存；追加新批次还要看会话和整盘状态。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p>“光盘标题”通常是卷标（volume label）；默认日期只是名称，不改变 MID 或续写状态。归档可用 <code>ARCHIVE_001</code> 等盘号，与盒子和索引对应。后续会话也可能另有卷标。</p>
+<figure class="guide-diagram"><img src="assets/diagrams/windows-modes.svg" alt="Windows Live 在复制时逐步写盘；Mastered 先排队，再按刻录按钮一次写入" loading="lazy"><figcaption>两个选项都能制作数据盘，区别首先在写入时机和后续修改方式。</figcaption></figure>
+
+<p>选择窗口通常只在空白或擦除后的盘上出现。DVD-RW 擦除、重新初始化后可改用另一种方式。实际流程看测试文件：进入“准备好写入”就是 Mastered，须点“完成刻录”；复制后弹出重插即可读出，则是 Live。资源管理器可能残留旧的待刻录列表，因此要看新文件落在哪个区域。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p>换软件续写前，用测试盘确认它会导入旧目录，写后重插仍能读到两批文件。Windows、CDBurnerXP、ImgBurn 的布局和会话流程可能不同；两个程序也不要同时控制一台光驱。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p><a id="windows-live-compatibility"></a></p>
+<h4 id="section-26">3.5.1 Windows Live 盘的读取兼容性<a class="heading-anchor" href="#section-26" aria-label="本节链接">#</a></h4>
+<p>Windows Live 使用 UDF，但不固定为 2.60；盘型和初始化选项会影响版本与布局。读盘还要同时满足盘型／层数、会话状态及 UDF 驱动对 VAT、缺陷管理或伪覆写结构的支持。能读取文件也不等于能继续写入。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a><a class="source-ref" href="#source-s11" aria-label="资料 S11">[S11]</a><a class="source-ref" href="#source-s12" aria-label="资料 S12">[S12]</a></p>
+<p>在制作盘的 Windows 电脑上，先弹出重插，检查新旧文件。换到另一台 Windows 电脑，先看光驱支持的盘型和层数，再打开样本文件；旧版 Windows 还可能不认识新版 UDF 或开放会话，可试另一台光驱。Linux、macOS 通常能读 UDF，但具体修订版、VAT 和开放会话仍需实盘测试，写入能力也要另测。家用播放器、车机则要按说明书核对数据盘文件系统、文件类型；DVD-Video／BD-Video 还须有规定的目录结构。</p>
+<p>要交给别人读取，可在测试盘分两批写入小文件，在目标设备重插、读回并核对哈希。若读不到，改用设备支持的 UDF 版本，或制作封闭的 ISO 9660／Joliet／UDF 桥接盘。遇到格式化提示应取消，回制作盘的电脑导出数据。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p><a id="erase-and-format"></a></p>
+<h3 id="section-27">3.6 格式化、擦除与 zeroing<a class="heading-anchor" href="#section-27" aria-label="本节链接">#</a></h3>
+<p>空白 DVD-R／BD-R 可直接用 ImgBurn 制作数据盘或写镜像，无须先 zeroing 或格式化。Windows Live 所说的“格式化”是在准备 UDF 和介质管理结构，不会使 R 盘变成可擦写盘。DVD-RW／BD-RE 则可擦除后重新使用；快速擦除可能只重置管理信息，Windows 的待刻录列表也未必随之清空。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a><a class="source-ref" href="#source-s11" aria-label="资料 S11">[S11]</a></p>
+<p>“刻录光盘”窗口选的是 Windows 接下来的写入流程；资源管理器里的“格式化”则按选定 UDF 版本重新准备介质，通常形成直接复制的布局。因此，在选 Mastered 后又格式化，不能再按之前的选择判断当前写法。擦除本身也不决定使用 Live 还是 Mastered。</p>
+<p>一次 DVD-RW 测试中，擦除后选 Live，文件却进了待刻录区；再次格式化后才能直接复制。另一次选 Mastered 后执行 UDF 格式化，也变成直接复制。仅凭界面无法确定前一次异常的具体原因。UDF 2.01 只标识版本，Mastered 数据盘也可能用 UDF；用可丢弃的小文件试写、弹出重插，才能确认实际流程。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p>切换 DVD-RW／BD-RE 的写法前，先备份、擦除并重插。选 Mastered 后直接加入测试文件，确认它进待刻录区，再“完成刻录”，中途不要格式化。选 Live 后等待初始化，确认测试文件直接写盘。若与预期不同，检查盘片状态和待刻录列表，从空盘重来。</p>
+<p>R 盘不能通过格式化清除旧数据，RW／RE 的快速擦除也不保证无法恢复。Windows 若要求格式化有资料的盘，应取消，换回原光驱查盘型、会话和 UDF，并先复制可读文件。</p>
+<p>DVD-R／BD-R 第一批数据和文件系统都已占用扇区。后续会话可写另一套目录，但若未导入旧文件，它们会从新目录视图消失。DVD-RW／BD-RE 若要更换布局，先备份，再擦除和初始化。</p>
+<h3 id="section-28">3.7 多会话与旧目录导入<a class="heading-anchor" href="#section-28" aria-label="本节链接">#</a></h3>
+<p>Session（会话）是一批记录，可含一条或多条 Track（轨道）。下一批从后续可写地址开始，加入管理信息、数据和目录。新目录导入旧文件，两批便都可见；若只收录新文件，旧扇区还在，却不出现在当前目录。Microsoft 的 IMAPI 说明要求续写前导入上一会话的文件系统。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a></p>
+<figure class="guide-diagram"><img src="assets/diagrams/multisession.svg" alt="两个会话按顺序占据盘面；第二会话导入旧目录时能看到 A 和 B，未导入时可能只看到 B" loading="lazy"><figcaption>第二会话的目录决定当前文件视图。旧会话未被导入时，旧扇区通常仍在盘上。</figcaption></figure>
+
+<p>“允许以后添加文件”只留下续写机会。CDBurnerXP 选“继续光盘／导入区段”后，须在下方待刻录项目看到旧文件；上方浏览窗显示 <code>G:</code> 还不够。若项目仍是 0 个文件，不要写第二批。一个 UDF 1.50 DVD-R 的失败例子见<a href="experiment-notes.html">写入行为记录</a>。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p>ImgBurn Disc Information 的 <code>Status</code> 指整盘，<code>State of Last Session</code> 指最后会话。预留的下一会话可能显示 <code>Incomplete</code>，第一会话却仍可读；<code>Complete</code> 也要结合 R 盘或 restricted overwrite 模式解释。应合看 <code>Sessions</code>、Track、<code>Next Writable Address</code>、可擦写标记和重插读回。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p>资源管理器通常只显示当前挂载的文件目录，不提供逐个会话浏览；CDBurnerXP 的数据项目窗口也不是旧会话恢复器。要找第一会话，先停止写盘，用能列出会话起点的工具检查盘面。Linux 的开源 <code>xorriso</code> 可以查看和提取 ISO 9660 会话；盘若只有 UDF 目录，或会话本身不完整，它未必能还原文件。IsoBuster 可用于检查多会话，但部分恢复功能收费。先只读复制能找到的文件，别为了找旧目录再次格式化或追加。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<h3 id="section-29">3.8 关闭轨道、会话与整盘<a class="heading-anchor" href="#section-29" aria-label="本节链接">#</a></h3>
+<p>Close Track 结束一条轨道，Close Session 完成当前会话，Finalize／Close Disc 则关闭整张一次写入盘的追加状态。软件的中文界面可能把几种操作都叫“封盘”；看原英文和写后的 Disc Information 更可靠。会话关闭后仍可能继续下一批，整盘最终化后通常无法再添加文件。ImgBurn 作者确认，Build 模式没有日后继续追加普通文件的多会话流程。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a><a class="source-ref" href="#source-s6" aria-label="资料 S6">[S6]</a><a class="source-ref" href="#source-s7" aria-label="资料 S7">[S7]</a></p>
+<p>重要备份可先在硬盘集齐文件，一次刻录后做 Verify、重插和哈希核验。确实要分批时，每批用 <code>S01_日期</code>、<code>S02_日期</code> 等独立目录和各自的校验表。频繁写入几 KB 的小会话会占用管理空间，日后也更难分辨哪一版文件有效。</p>
+<h2 id="section-30">四、购买光驱和盘片<a class="heading-anchor" href="#section-30" aria-label="本节链接">#</a></h2>
+<h3 id="section-31">4.1 光驱的写入与 UHD 读取能力<a class="heading-anchor" href="#section-31" aria-label="本节链接">#</a></h3>
+<p>2026 年 8 月，按全新、有保修、开箱即用筛选，并优先看官方旗舰店或平台自营，以下两款外置机的参考价为：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>设备</th>
+<th>当时报价</th>
+<th>可能的机芯及规格</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ASUS <code>BW-16D1H-U</code></td>
+<td>约 1499 元</td>
+<td>5.25 英寸厚机；可能装 <code>BW-16D1HT</code> 或 Pioneer <code>BDR-209MBK</code> OEM，标称 BDXL</td>
+</tr>
+<tr>
+<td>UGREEN <code>CM780</code></td>
+<td>约 799 元</td>
+<td>USB 薄机；可能装 <code>BU40N</code> 衍生机芯，标称 BDXL</td>
+</tr>
+</tbody></table></div>
+<p>同名外壳可能换机芯，购买时以实机 ID、固件和可写 Profile 为准；薄机还需留意尺寸与 USB 供电。价格和售后也要按当下渠道重查。</p>
+<p>2026 年 8 月，二手 CD／DVD 机的入门预算约 200 元，蓝光数据刻录约 1000～2000 元。二手机的激光器、托盘状态未知，先用测试盘刻录、Verify、重插读回。</p>
+<p>按将使用的盘型查可写 Profile：DVD 的 <code>+</code>／<code>-</code>、RW、DL、RAM，BD 的 25／50 GB，BDXL 的 100／128 GB 都要分开核对。连续刻录优先考虑散热、供电更充足的 5.25 英寸机芯。</p>
+<p>要读 4K UHD，可按 <a href="https://forum.makemkv.com/forum/viewtopic.php?f=16&t=19634">MakeMKV 社区清单</a>向卖家索取实机标签和 Drive Information，核对机芯、生产日期、<code>MT1959</code>、LG <code>NS50/NB50</code> 服务码和固件；外置产品还要查内部机芯与 USB 桥接。Pioneer 指定机型的新固件可能封住跨刷路径。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<p>数据刻录看写入 Profile 和 Verify；MakeMKV 原始读取看 LibreDrive；商业 UHD 播放还涉及 AACS 2.x 与播放软件。已满足用途的固件无须为改速度而跨刷，某些跨刷会损失写入能力。<a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a></p>
+<h3 id="section-32">4.2 盘片产地与产品系列<a class="heading-anchor" href="#section-32" aria-label="本节链接">#</a></h3>
+<p>盘型决定容量和记录方式；产地、制造商声明、商品号、MID 及内圈码用于追溯批次。</p>
+<figure class="guide-diagram"><img src="assets/diagrams/buying-routes.svg" alt="按反复修改、旧设备读取、大容量一次存档三种用途选择 DVD 可擦写盘、DVD 一次写入盘或 BD-R" loading="lazy"><figcaption>按用途选择盘型后，再比较品牌、批次与价格。</figcaption></figure>
+
+<h4 id="section-33">4.2.1 产地、品牌与实际制造商<a class="heading-anchor" href="#section-33" aria-label="本节链接">#</a></h4>
+<p>日本、台湾、中国大陆、印度、阿联酋等地都生产过可录光盘；品牌所属地不一定是制造地。太阳诱电、松下、索尼、三菱的历史日本原产盘有好口碑，台湾厂也有合格产品。CMC、RITEK 和威宝各有多条产品线。买盘时记录商品号、包装产地与厂商声明、MID、内圈码；条码前缀和珍宝盒手感不足以鉴定工厂。<a class="source-ref" href="#source-s2" aria-label="资料 S2">[S2]</a><a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a></p>
+<p>威宝跨三菱与 CMC 时期可能共用 <code>VERBAT IMe</code>；43714 的具体样本及三菱商标声明见 1.5 节。太阳诱电（Taiyo Yuden）曾是重要的 CD-R／DVD-R 制造商；其旧库存、JVC 盘和 CMC Pro 要分别查来源和存放年月。紫晶存储等企业级光存储采用专门的设备和介质，不属于普通空白盘市场。</p>
+<h4 id="section-34">4.2.2 CD、DVD 与 BD 候选系列<a class="heading-anchor" href="#section-34" aria-label="本节链接">#</a></h4>
+<p>CD-R 可查铼德 Excellent、Demo Audio、Medical Data，三菱／威宝历史 AZO 系列，以及太阳诱电旧库存。Demo、Medical 是系列名，不是寿命认证。寻找酞菁染料或金反射层，应查厂商材料说明。<a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a><a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<p>4.7 GB DVD 可查 RITEK Excellent（双 X）、威宝 AZO、DVD M-DISC，或明确公布反射层材料的 Gold DVD-R。AZO 是染料，DVD M-DISC 还需相应写入策略。8.5 GB DVD+R DL 应少量试刻、检查跨层读取；大文件较多时也可比较 BD-R 的单位容量价格。<a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a><a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<p>25 GB BD-R 可查 Verbatim Hard Coat、索尼／松下历史系列和铼德 <code>RITEK BR2／BR3</code>；后两者是 4×／6× HTL 代码，不代表质量等级。50 GB BD-R DL 可查威宝、铼德和 BD M-DISC：Juri 收录的 <code>DBR50RMDPV1</code> 为 <code>VERBAT IMf</code>。100 GB 有 <code>DBR100YMDPV1 / VERBAT IMk</code> 等历史样本；128 GB 须明确标注四层。买多层盘先查光驱可写 Profile 和目标设备读盘能力。BD-RE 可用于临时更新，按容量和实际写速购买。<a class="source-ref" href="#source-s2" aria-label="资料 S2">[S2]</a><a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<p>Juri 的<a href="http://juri.su/bdr.htm">BD-R 目录</a>收录了标为 2011、2016 年的威宝 <code>43714 / VERBAT IMe</code>，以及 2016 年的 <code>43840 / CMCMAG BA5</code>：商品号相近也可能跨年代、跨 MID。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<p><a href="https://ez647.sk/jvc.html">ez647 的 JVC 记录</a>包括 DVD-R <code>TYG03</code>，BD-R <code>MEI T01</code> HTL、<code>TYG BD Y03</code> 和 <code>JVC AM S6L</code> LTH。只看 JVC 商标无法判定记录层。<a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a></p>
+<p>铼德／Ridata 的经济线、Excellent 和 M-DISC 是不同系列；DVD 的“双 X”与 BD-R 的 <code>BR2/BR3</code> 无对应关系。ez647 一张 Imation 品牌 BR2 的 385 天读盘失败记录见 1.6 节；单盘案例不能推算整类盘的失效率。<a class="source-ref" href="#source-s2" aria-label="资料 S2">[S2]</a><a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a></p>
+<p><a href="http://juri.su/bdrtest.htm">Juri 的汇总表</a>中，Ritek <code>BDR25 / BR2</code> 为 4×、平均 LDC／BIS <code>135.62 / 2.10</code>、<code>Data</code> 日期 2016-11-26；RiDATA <code>BDR25 / BR3</code> 为 6×、<code>78.91 / 1.42</code>、2016-12-25。盘片标为 2023 年的 Mirex <code>BR3</code> 则为 <code>14.89 / 0.27</code>，测试机已更换。表未分别说明刻录日和扫描日，批次、写速也不同。这些是单盘记录，整桶购买前仍要用自己的设备试刻、读回。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<p><a href="http://juri.su/cdr.htm">Juri 的 CD-R 目录</a>中，威宝 <code>43347</code> 的 2007 年印度样本 ATIP 指向 Moser Baer，2016 年中国样本指向 CMC。<a href="http://juri.su/dvdr.htm">DVD 目录</a>里，威宝 <code>43465</code> 是日本产 <code>TYG02</code>，<code>43580</code> 是台湾产 <code>MCC 02RG20</code>。比较品牌系列时应保留商品号、年代、产地和实盘标识。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<p>BD M-DISC 与 DVD M-DISC 的材料路线不同；购买前查可写 Profile 和兼容表，再试刻一张。<a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<h3 id="section-35">4.3 写入速度与质量检查<a class="heading-anchor" href="#section-35" aria-label="本节链接">#</a></h3>
+<p>“CD 不超过 16×、DVD 不超过 8×、BD 不超过 4×”可当试刻起点，不是统一最佳速度；三种介质的 4× 数据率也不同。新批次选双方支持的中档速度，Verify、重插读回，调整速度后再比较结果。高速盘强制用极低速度未必更好。</p>
+<p>连续出错时，用已知良盘或另一台光驱交叉检查。质量扫描要固定设备与速度；目录和会话也须留空间，但没有统一留白比例。重要文件比对 SHA-256，条件允许时异机读回。</p>
+<p>可擦写盘还须确认目标设备支持 RW、RE 或 RAM；旧播放器可能不认盘型或较低反射率。</p>
+<h3 id="section-36">4.4 采购数量和到货测试<a class="heading-anchor" href="#section-36" aria-label="本节链接">#</a></h3>
+<p>按资料容量和第二副本计算数量，另留一两张试刻。已有的盘足够做首轮备份，就先写入、校验，再按新增资料补货；整桶购买前先确认批次。</p>
+<p>以 2026 年的一组零售报价为例，25 GB × 50 张约 92 元，50 GB × 50 张约 333 元，名义容量价分别约 0.074 元/GB 和 0.133 元/GB；前者约便宜 45%。计算备份成本时，还应计入失败盘、包装、异机读盘和第二份副本。连续 40 GB 的大文件用 50 GB 盘省去分卷；能按 20 GB 自然分批的资料，用 25 GB 盘更灵活。</p>
+<p>到货后留包装照片、商品号、产地和厂商声明，记 MID、极性、层数及速度；样本盘附刻录日志、Verify、重插读回和哈希。<strong>盘片标注年份、刻录日、首次扫描日、复测日</strong>要分开记录。固定条件的质量曲线及异机读回可供日后比较。空白盘可能无法做 Disc Quality 扫描；<code>Discovery</code> 和 <code>Create Test Disc</code> 会消耗测试盘。借用 ez647、Juri 的旧图时，先查日期含义和扫描条件；没有刻录日便不能推算写后存放年数，曲线相似也不足以鉴定工厂。<a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a><a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<h2 id="section-37">五、刻录与读回校验<a class="heading-anchor" href="#section-37" aria-label="本节链接">#</a></h2>
+<p>以下用 <code>G:</code> 代表光驱，用 <code>D:\归档\ARCHIVE_001</code> 代表源文件夹，操作时换成实际路径。有资料的盘先只读检查，必要时把文件复制到硬盘，再考虑写入、格式化或擦除。</p>
+<h3 id="section-38">5.1 从空盘到首次校验<a class="heading-anchor" href="#section-38" aria-label="本节链接">#</a></h3>
+<p>普通文件备份可先在硬盘整理完整快照，再一次写到空白盘，读回校验并保存清单。每张盘给唯一编号，如 <code>ARCHIVE_001</code>，写在盒脊、盘面可写区域和电子索引里。完整 ISO 用 5.3 节；分批追加用 5.4 或 5.6 节；需反复修改则用可擦写盘，按 5.7 节测试。制作 DVD-Video／BD-Video 要用相应编排软件。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<figure class="guide-diagram"><img src="assets/diagrams/archive-workflow.svg" alt="从整理源文件、生成哈希清单、刻录 Verify，到弹出重插、哈希复查和保存第二份副本的流程" loading="lazy"><figcaption>写盘后弹出重插，再核对哈希并保存第二份副本。</figcaption></figure>
+
+<h3 id="section-39">5.2 用 ImgBurn 刻录普通文件<a class="heading-anchor" href="#section-39" aria-label="本节链接">#</a></h3>
+<ol>
+<li>在硬盘建立 <code>D:\归档\ARCHIVE_001\DATA</code>，放入待备份文件，刻录开始后不再修改。大量压缩包应附目录说明；重要资料按用途分包，保留原文件索引，以免一个包损坏牵连全部。</li>
+<li>在 <code>ARCHIVE_001</code> 根目录写 <code>README.txt</code>，记录盘号、日期、来源、目录、工具和写速。按 5.8 节生成逐文件 <code>SHA256.csv</code>，硬盘另存一份。清单放在 <code>DATA</code> 外，避免计算自身哈希。</li>
+<li>检查容量：4.7 GB DVD 在 Windows 约为 4.38 GiB，25 GB BD 约为 23.3 GiB；还要留文件系统和管理空间。新批次别填满。</li>
+<li>放入空白盘，关闭 Windows 格式化提示。ImgBurn Disc Information 应显示正确的 <code>Current Profile</code>、<code>Status: Empty</code>、层数、容量、MID 和速度；若已有会话，先查明盘片。</li>
+</ol>
+<pre><code class="language-text">D:\归档\ARCHIVE_001\
+├─ README.txt
+├─ SHA256.csv
+└─ DATA\
+   ├─ Photos\
+   ├─ Documents\
+   └─ Project_A.zip
+</code></pre>
+<ol start="5">
+<li>在 ImgBurn 选 <code>Write files/folders to disc</code>（Build），将整个 <code>ARCHIVE_001</code> 文件夹加入 Source。若只见 <code>Show Disc Layout Editor</code>，打开它排目录，或在 <code>Input</code> 菜单切到 <code>Standard</code>。预览盘根：加入整个文件夹后应是 <code>G:\ARCHIVE_001\...</code>；只加入内部文件则会改变根目录。</li>
+<li>在 Options 选目标设备支持的 UDF 或桥接文件系统；Labels 填 <code>ARCHIVE_001</code>。Device 选刻录机和双方支持的写速，新批次先试中档。勾选 Verify，核对文件数、容量和目的光驱，再写盘。<a class="source-ref" href="#source-s6" aria-label="资料 S6">[S6]</a></li>
+<li>写完且 Verify 通过后，弹出重插，核对文件数和大小，从盘上打开不同位置的文件，并比对重要文件或全部文件的 SHA-256。</li>
+<li>在硬盘索引中记录盘号、盘片型号／MID、光驱与固件、写速、Verify 和哈希结果。独立入盒，避开热源、日晒和潮湿；不可替代的资料另存异地或不同介质副本，隔几个月或一年抽检。</li>
+</ol>
+<div class="walkthrough-steps">
+<figure><img src="assets/screenshots/imgburn-home-snipaste.png" alt="ImgBurn 主界面，左上角为 Write image file to disc，右上角为 Write files/folders to disc" loading="lazy"><figcaption>ImgBurn 主界面：普通文件选右上角的 <code>Write files/folders to disc</code>；已有 ISO 选左上角的 <code>Write image file to disc</code>。</figcaption></figure>
+<figure><img src="assets/screenshots/imgburn-build-options-snipaste.png" alt="ImgBurn Build 模式的 Options 页，File System 为 ISO9660 加 UDF，UDF Revision 为 1.50，Verify 已勾选；Source 尚为空" loading="lazy"><figcaption><code>Options</code>：设置文件系统与 UDF 版本。截图中尚未加入源文件，DVD-RW 也提示需擦除。</figcaption></figure>
+<figure><img src="assets/screenshots/imgburn-build-labels-snipaste.png" alt="ImgBurn Build 模式的 Labels 页，ISO9660 和 UDF 卷标均填写 IMG_BUILD_DEMO" loading="lazy"><figcaption><code>Labels</code>：桥接盘须检查 ISO 9660 与 UDF 两处卷标；截图仍未加入源文件。</figcaption></figure>
+</div>
+
+<h3 id="section-40">5.3 用 ImgBurn 写入 ISO 镜像<a class="heading-anchor" href="#section-40" aria-label="本节链接">#</a></h3>
+<p>从发布方取得 ISO 和 SHA-256，核对下载文件与盘片容量。放入空白盘，关闭 Windows 的写盘提示；在 ImgBurn 选 <code>Write image file to disc</code>，Source 指向 ISO，Destination 选光驱，设支持的速度并勾选 Verify。写后弹出重插；安装盘还须在目标电脑试启动。镜像已有文件系统，不必另选 UDF；若盘上只有一个 <code>.iso</code> 文件，就是误用了普通文件刻录。<a class="source-ref" href="#source-s6" aria-label="资料 S6">[S6]</a></p>
+<div class="walkthrough-steps"><figure><img src="assets/screenshots/imgburn-write-image-snipaste.png" alt="ImgBurn Write image 模式，Source 选中 Linux Mint ISO，Destination 是 ASUS 光驱，Verify 已勾选；盘片状态提示需要擦除" loading="lazy"><figcaption>Source 选 ISO，Destination 选光驱并勾选 Verify。图中 DVD-RW 已有数据（<code>Disc Needs Erasing</code>）；光驱列出 4×，选择框却显示 12×，正式写入前须核对。</figcaption></figure></div>
+
+<h3 id="section-41">5.4 用 Windows Live 分批写入<a class="heading-anchor" href="#section-41" aria-label="本节链接">#</a></h3>
+<ol>
+<li>放入空白盘，输入卷标，选“像 U 盘一样使用”，等 Windows 初始化。DVD-RW 若刚切换写法，先擦除并重插；已有文件需要保留时取消操作。</li>
+<li>从硬盘复制可丢弃的 <code>S01_test.txt</code>。若文件进入“准备好写入到光盘中的文件”，当前仍是待刻录流程，先停下。若直接写入，弹出重插并核对内容。</li>
+<li>后续批次放进 <code>S02_日期</code> 等目录。每批都重插，同时打开第一批与新增文件。</li>
+<li>要直接修改盘上文件，再用 <code>edit_test.txt</code> 试验：编辑器保存后重插，比对 SHA-256，别只看时间戳。DVD-R、DVD-RW、BD-RE 的结果可能不同。</li>
+</ol>
+<p>选 Live 并完成初始化后，通常无须再点“格式化”。若文件仍进待刻录区，先停下；确认介质允许重新格式化、旧数据无需保留，再重新初始化，并用测试文件验证。</p>
+<div class="walkthrough-steps"><figure><img src="assets/screenshots/windows-udf-format-snipaste.png" alt="Windows 格式化光驱对话框，容量为 4.38 GB，文件系统默认为 UDF 2.01，快速格式化已勾选" loading="lazy"><figcaption>4.38 GB 可擦写盘的 UDF 格式化窗口。标题中的“BD-RE 驱动器”是光驱名称，不代表盘型；有资料要保留时不要点击“开始”。</figcaption></figure></div>
+
+<p>某些 DVD-R 组合允许保存同名新版，但旧扇区不会回收。经常改文件可选 DVD-RW／BD-RE，或在硬盘改好再刻新快照。交给另一台电脑前，按<a href="#windows-live-compatibility">Windows Live 兼容性检查</a>测试读回；若对方要求格式化，应取消并回原电脑导出。<a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a><a class="source-ref" href="#source-s12" aria-label="资料 S12">[S12]</a></p>
+<h3 id="section-42">5.5 用 Windows Mastered 刻录文件<a class="heading-anchor" href="#section-42" aria-label="本节链接">#</a></h3>
+<ol>
+<li>放入空白盘，选“与 CD/DVD 播放器一起使用”，填写卷标。复用 DVD-RW／BD-RE 时，先保存旧资料、擦除、重插。选 Mastered 后不要再点“格式化”。</li>
+<li>将文件拖入光驱窗口，确认它进入“准备好写入到光盘中的文件”；若直接写盘，按<a href="#erase-and-format">格式化与擦除</a>检查状态。</li>
+<li>核对待刻录列表的文件名、数量，移出不需要的 <code>desktop.ini</code>。</li>
+<li>在 Windows 11 的“更多选项”中点“完成刻录”，确认卷标和速度，点“下一页”开始写盘。</li>
+<li>成功后弹出重插，从盘上打开文件并比对哈希。</li>
+</ol>
+<p>这仍是数据盘；目标播放器须支持盘上的文件类型。若要续写，先查会话和整盘状态，再确认软件能导入旧目录。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a><a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<h3 id="section-43">5.6 用 CDBurnerXP 续写会话<a class="heading-anchor" href="#section-43" aria-label="本节链接">#</a></h3>
+<p>第一次在 CDBurnerXP 数据盘项目中加入 <code>S01_日期</code>，结尾选“保留以后追加”。Verify、弹出重插，打开第一批文件。第二次选“继续光盘／导入区段”，确认<strong>下方待刻录项目</strong>已有 <code>S01</code>，再加 <code>S02_日期</code>。上方浏览区能看到旧盘，不代表项目已导入；若下方仍为 0 个文件，停止刻录，检查软件与文件系统兼容性或换新盘。<a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p>第二批写完，再 Verify、重插并校验两批文件。此后每批重复。确定不再续写或目标设备要求时，先核对所有批次都在目录中，再选 Finalize／Close Disc。几 KB 的小会话会浪费管理空间，可按周或主题凑批。</p>
+<h3 id="section-44">5.7 擦写 DVD-RW 与 BD-RE<a class="heading-anchor" href="#section-44" aria-label="本节链接">#</a></h3>
+<p>先把旧数据复制到硬盘并验证。选 Windows Live UDF 或经测试的可读写方式，依次试写、重插、编辑、再重插，并删除另一个测试文件，查看目录和可用空间。需要重来时执行“擦除此光盘”、初始化并重插。快速擦除不等于安全抹除。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<p>DVD-RW 的受限覆写模式可修改和删除文件；能否直接在编辑器保存，须按软件测试。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<h3 id="section-45">5.8 生成并核对 SHA-256 清单<a class="heading-anchor" href="#section-45" aria-label="本节链接">#</a></h3>
+<p>SHA-256 清单逐文件记录相对路径与哈希；分批盘可为第二批单独建 <code>SHA256_S02.csv</code>。以下脚本只计算 <code>DATA</code>，把清单写在外层，避免算入自身：</p>
+<pre><code class="language-powershell">$dataRoot = &#39;D:\归档\ARCHIVE_001\DATA&#39;
+$prefix = (Resolve-Path -LiteralPath $dataRoot).Path.TrimEnd(&#39;\&#39;) + &#39;\&#39;
+Get-ChildItem -LiteralPath $dataRoot -File -Recurse |
+  Sort-Object FullName |
+  ForEach-Object {
+    [pscustomobject]@{
+      Path = $_.FullName.Substring($prefix.Length)
+      SHA256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+    }
+  } |
+  Export-Csv -LiteralPath &#39;D:\归档\ARCHIVE_001\SHA256.csv&#39; -NoTypeInformation -Encoding UTF8
+</code></pre>
+<p>写盘、重插后，从 <code>G:\ARCHIVE_001\DATA</code> 逐文件重算哈希。匹配说明此次读出的字节与写前一致；Verify 是刻录软件的读回检查。若失败，保留硬盘原件和日志，检查目录与盘况，再决定是否重刻。<a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a></p>
+<pre><code class="language-powershell">$discData = &#39;G:\ARCHIVE_001\DATA&#39;
+$bad = foreach ($row in Import-Csv -LiteralPath &#39;G:\ARCHIVE_001\SHA256.csv&#39;) {
+  $file = Join-Path $discData $row.Path
+  if (-not (Test-Path -LiteralPath $file) -or
+      (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $row.SHA256) {
+    $row.Path
+  }
+}
+if ($bad) { $bad } else { &#39;全部文件的 SHA-256 均匹配&#39; }
+</code></pre>
+<h3 id="section-46">5.9 质量扫描与常见故障<a class="heading-anchor" href="#section-46" aria-label="本节链接">#</a></h3>
+<p>ImgBurn Discovery 会写测试数据，消耗空白盘，不接受待归档文件。质量扫描只覆盖已写区域；要看外圈或跨层区，就要写到相应位置并完整读取。档案盘可做非破坏性扫描；<code>No suitable disc inserted</code> 也可能只是光驱不支持 BD 扫描命令。备份的可用性优先看 Verify、文件哈希、连续读取及异机读盘。<a class="source-ref" href="#source-s6" aria-label="资料 S6">[S6]</a><a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a><a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>看到的现象</th>
+<th>先做的只读检查</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>空白盘在资源管理器打不开</td>
+<td>ImgBurn 查 <code>Current Profile</code>、<code>Status: Empty</code>；空白盘尚无目录</td>
+</tr>
+<tr>
+<td>出现 <code>desktop.ini</code> 和“准备好写入”</td>
+<td>检查是否还没点“刻录到光盘”</td>
+</tr>
+<tr>
+<td>已占空间却看不到文件</td>
+<td>查会话、最后目录与文件系统，暂不格式化</td>
+</tr>
+<tr>
+<td>最后会话 <code>Incomplete</code></td>
+<td>查第一会话、轨道和读回；可能只是预留的空白会话</td>
+</tr>
+<tr>
+<td>DVD-R 能新增却不能保存旧文件</td>
+<td>在硬盘改好新版，换新文件名追加</td>
+</tr>
+<tr>
+<td>新会话后旧目录消失</td>
+<td>停止写入，用会话工具只读检查旧目录是否导入</td>
+</tr>
+<tr>
+<td><code>Verify</code> 失败或哈希不一致</td>
+<td>保留源文件与日志，另用一张盘重刻</td>
+</tr>
+<tr>
+<td>另一电脑要求格式化</td>
+<td>取消，回原电脑导出；查盘型、UDF 版本和光驱</td>
+</tr>
+</tbody></table></div>
+<h2 id="section-47">六、资料来源<a class="heading-anchor" href="#section-47" aria-label="本节链接">#</a></h2>
+<p>网络资料核查于 2026-10-06。标准与软件用语以规范、作者说明为准；论坛扫描和盘片目录只记录具体样本。</p>
+<p><a id="source-s1"></a><strong><a class="source-ref" href="#source-s1" aria-label="资料 S1">[S1]</a> Bedcore《数据光盘刻录理论入门》V1.0.2。</strong> <a href="https://www.bilibili.com/video/BV1itur6qExK/">Bilibili 视频</a>，基础文档标注 2026-08-15，19 页，CC BY-SA 3.0。本指南改写了文字、章节和图示；第二章的 20 幅机芯照片及标志图取自基础文档。商标归各权利人。</p>
+<p><a id="source-s2"></a><strong><a class="source-ref" href="#source-s2" aria-label="资料 S2">[S2]</a> 蓝光协会 MID 名录。</strong> <a href="https://blu-raydisc.info/licensee-list/discmanuid-licenseelist.php">Disc Manufacturer ID &amp; Media Type ID Licensee List</a>。按盘型、层数列出授权 MID、速度和 HTL／LTH；<code>VERBAT IMe</code> 同列于 CMC 与 Mitsubishi Chemical Media 名下。</p>
+<p><a id="source-s3"></a><strong><a class="source-ref" href="#source-s3" aria-label="资料 S3">[S3]</a> MakeMKV 社区指南。</strong> <a href="https://forum.makemkv.com/forum/viewtopic.php?f=16&t=19634">Ultimate UHD Drives Flashing Guide Updated 2026</a>，首帖的驱动器、固件、<em>sleep bug</em> 与跨刷章节。社区路线须按实机平台、服务码和当前帖文核对。</p>
+<p><a id="source-s4"></a><strong><a class="source-ref" href="#source-s4" aria-label="资料 S4">[S4]</a> Microsoft 多会话说明。</strong> <a href="https://learn.microsoft.com/en-us/windows/win32/imapi/creating-a-multisession-disc">Microsoft：Creating a Multisession Disc</a>。说明如何导入上一会话文件系统，以及会话与关闭状态的关系。</p>
+<p><a id="source-s5"></a><strong><a class="source-ref" href="#source-s5" aria-label="资料 S5">[S5]</a> Microsoft 格式概览。</strong> <a href="https://learn.microsoft.com/en-us/windows/win32/imapi/disc-formats">Microsoft：Disc Formats</a>。概述 ISO 9660、Joliet、UDF 与桥接盘。</p>
+<p><a id="source-s6"></a><strong><a class="source-ref" href="#source-s6" aria-label="资料 S6">[S6]</a> ImgBurn 功能。</strong> <a href="https://www.imgburn.com/index.php?act=features">ImgBurn 官方 Features</a>。列出 Read、Build、Write、Verify、Discovery 的用途。</p>
+<p><a id="source-s7"></a><strong><a class="source-ref" href="#source-s7" aria-label="资料 S7">[S7]</a> ImgBurn 作者答复。</strong> <a href="https://forum.imgburn.com/topic/3859-not-finalizing-the-cd-when-in-build-mode/">ImgBurn Forum：NOT finalizing the CD when in build mode?</a>，2007-04-13。作者说明 ImgBurn 没有 Build 后继续添加普通文件的多会话流程。</p>
+<p><a id="source-s8"></a><strong><a class="source-ref" href="#source-s8" aria-label="资料 S8">[S8]</a> ez647 盘片资料库。</strong> <a href="https://ez647.sk/media.html">介质总目录</a>、<a href="https://ez647.sk/mitsubishi_kagaku/verbatime000bdr.html">Verbatim <code>VERBAT-IMe-000</code></a>、<a href="https://ez647.sk/ritek/ritekbr2000_bdr.html">RITEK BR2</a>、<a href="https://ez647.sk/jvc.html">JVC 记录</a>。单盘页提供包装、内圈码和复测日期。</p>
+<p><a id="source-s9"></a><strong><a class="source-ref" href="#source-s9" aria-label="资料 S9">[S9]</a> Juri 单盘记录。</strong> <a href="http://juri.su/bdr.htm">BD-R 索引</a>、<a href="http://juri.su/bdrtest.htm">LDC／BIS 汇总</a>、<a href="http://juri.su/lthhtl.htm">LTH／HTL 户外对照</a>、<a href="http://juri.su/cdr.htm">CD-R</a>、<a href="http://juri.su/dvdr.htm">DVD</a>、<a href="http://juri.su/mdisc.htm">M-DISC</a>。汇总表的 <code>Data</code> 日期未拆成刻录日与扫描日；户外对照则明确给出写入和最终测试日。</p>
+<p><a id="source-s10"></a><strong><a class="source-ref" href="#source-s10" aria-label="资料 S10">[S10]</a> 写入行为记录。</strong> <a href="experiment-notes.html">DVD-R 与 DVD-RW 的三盘实验</a>：介质、软件版本、步骤及重插读回结果。</p>
+<p><a id="source-s11"></a><strong><a class="source-ref" href="#source-s11" aria-label="资料 S11">[S11]</a> 卷与文件结构标准。</strong> <a href="https://ecma-international.org/publications-and-standards/standards/ecma-167/">Ecma International：ECMA-167</a>。提供光介质卷和文件结构的标准背景。</p>
+<p><a id="source-s12"></a><strong><a class="source-ref" href="#source-s12" aria-label="资料 S12">[S12]</a> UDF 实现文档。</strong> <a href="https://man7.org/linux/man-pages/man8/mkudffs.8.html">udftools：mkudffs(8)</a>，列有各 UDF 修订版与介质选项。</p>
+<p><a id="source-s13"></a><strong><a class="source-ref" href="#source-s13" aria-label="资料 S13">[S13]</a> 加拿大文物保护研究所保存指南。</strong> <a href="https://www.canada.ca/en/conservation-institute/services/conservation-preservation-publications/canadian-conservation-institute-notes/longevity-recordable-cds-dvds.html">CCI Notes 19/1：Longevity of Recordable CDs and DVDs</a>，表 2 及保存建议；表中排名未计入污染物，建议温湿度不是统一测试条件。</p>
+<p><a id="source-s14"></a><strong><a class="source-ref" href="#source-s14" aria-label="资料 S14">[S14]</a> CD 与 DVD 盘体结构。</strong> Fred R. Byers，<a href="https://www.clir.org/wp-content/uploads/sites/6/pub121.pdf">《Care and Handling of CDs and DVDs》</a>，Council on Library and Information Resources／NIST，2003，第 3 章及图 1～11。说明 CD 顶面的薄漆和反射层、DVD 的双基板、只读盘凹坑、有机染料和相变膜。书中尚未涉及后来的可刻录双层 DVD。</p>
+<p><a id="source-s15"></a><strong><a class="source-ref" href="#source-s15" aria-label="资料 S15">[S15]</a> BD-ROM 物理结构。</strong> Blu-ray Disc Association，<a href="https://web.archive.org/web/20110928104732id_/https://www.blu-raydisc.com/Assets/Downloadablefile/BD-ROMwhitepaper20070308-15270.pdf">《White Paper Blu-ray Disc Format, 1C: Physical Format Specifications for BD-ROM》</a>，第 1、4 章：约 1.1 mm 基板、约 0.1 mm 覆盖层，双层盘约 0.025 mm 透明间隔层；硬涂层可选。</p>
+<p><a id="source-s16"></a><strong><a class="source-ref" href="#source-s16" aria-label="资料 S16">[S16]</a> BD-R 物理结构。</strong> Blu-ray Disc Association，<a href="https://blog.ligos.net/images/The-Reliability-Of-Optical-Disks/BD-R_Physical_3rd_edition_0602f1-13322.pdf">《White Paper Blu-ray Disc Format: BD-R Physical Format, 3rd Edition》镜像</a>，第 2.2 节及图 2.2.2、2.6.3。列出有机与无机记录材料示例，单层记录区距读盘面约 100 µm，双层 L1／L0 分别约 75／100 µm。</p>
+<p><a id="source-s17"></a><strong><a class="source-ref" href="#source-s17" aria-label="资料 S17">[S17]</a> 可刻录双层 DVD。</strong> Verbatim／Mitsubishi Kagaku Media，<a href="https://www.cdrom2go.com/dvd-plus-r-dl-white-paper">《DVD+R DL White Paper》</a>，Double Layer Disc Structure 与各层说明。以该厂家早期 DVD+R DL 为例，说明半透 L0、透明间隔层、L1 染料与反射层。不同厂商及 DVD-R DL 不应照此认定具体薄膜配方。</p>
+<p><a id="source-s18"></a><strong><a class="source-ref" href="#source-s18" aria-label="资料 S18">[S18]</a> BD-RE 与三层 BDXL。</strong> Blu-ray Disc Association，<a href="https://web.archive.org/web/20200411111052id_/http://www.blu-raydisc.com/Assets/Downloadablefile/White_Paper_BD-RE_5th_20180216.pdf">《White Paper Blu-ray Disc Format, 1A: Physical Format Specifications for BD-RE》</a>，第 2～4 章。说明相变记录、100／75 µm 的单层与双层层位，以及 BD-RE 三层 100／75／57 µm 的示例。</p>
+</article>
+      </main>
+      <footer class="site-footer">
+        <p>写完后重插读回；不可替代的资料至少保留第二份副本。</p>
+      </footer>
+    </div>
+  </div>
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="返回顶部" title="返回顶部">↑</button>
+  <script>(() => {
+  const root = document.documentElement;
+  const theme = document.getElementById('theme-toggle');
+  let saved;
+  try { saved = localStorage.getItem('optical-disc-theme'); } catch (_) { /* file:// storage may be blocked */ }
+  if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
+  theme?.addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('optical-disc-theme', root.dataset.theme); } catch (_) { /* theme still works for this page */ }
+  });
+
+  const links = [...document.querySelectorAll('#toc a[href^="#"]')];
+  const tocToggle = document.getElementById('toc-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  tocToggle?.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('open');
+    tocToggle.setAttribute('aria-expanded', String(open));
+    tocToggle.firstChild.textContent = open ? '收起章节目录 ' : '展开章节目录 ';
+  });
+  for (const link of links) link.addEventListener('click', () => {
+    if (matchMedia('(max-width: 830px)').matches) {
+      sidebar.classList.remove('open');
+      tocToggle?.setAttribute('aria-expanded', 'false');
+      tocToggle.firstChild.textContent = '展开章节目录 ';
+    }
+  });
+  const input = document.getElementById('nav-search');
+  input?.addEventListener('input', () => {
+    const term = input.value.trim().toLocaleLowerCase();
+    for (const link of links) link.hidden = !!term && !link.textContent.toLocaleLowerCase().includes(term);
+  });
+
+  const headings = links.map(link => document.getElementById(link.hash.slice(1))).filter(Boolean);
+  const observer = new IntersectionObserver(entries => {
+    const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+    if (!visible.length) return;
+    for (const link of links) link.classList.toggle('active', link.hash === `#${visible[0].target.id}`);
+  }, { rootMargin: '-8% 0px -78% 0px' });
+  headings.forEach(heading => observer.observe(heading));
+
+  const progress = document.getElementById('read-progress');
+  const top = document.getElementById('back-to-top');
+  const update = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = `${max > 0 ? Math.max(0, Math.min(100, scrollY / max * 100)) : 0}%`;
+    top.classList.toggle('visible', scrollY > 700);
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+  top?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  const yearbook = document.getElementById('yearbook-viewer');
+  const yearbookToggle = document.getElementById('yearbook-toggle');
+  const setYearbookExpanded = open => {
+    yearbook?.classList.toggle('expanded', open);
+    yearbookToggle?.setAttribute('aria-expanded', String(open));
+    if (yearbookToggle) yearbookToggle.textContent = open ? '关闭放大' : '放大查看';
+    document.body.style.overflow = open ? 'hidden' : '';
+  };
+  yearbookToggle?.addEventListener('click', () => setYearbookExpanded(!yearbook.classList.contains('expanded')));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && yearbook?.classList.contains('expanded')) setYearbookExpanded(false);
+  });
+})();
+</script>
+</body>
+</html>
