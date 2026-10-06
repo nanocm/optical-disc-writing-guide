@@ -12,6 +12,27 @@ if (chapters.length !== 7) throw new Error(`Expected 7 chapters, found ${chapter
 const source = chapters.map(name => fs.readFileSync(path.join(chapterDir, name), 'utf8').trim()).join('\n\n') + '\n';
 fs.writeFileSync(path.join(dir, 'content.md'), source, 'utf8');
 
+const markdownGuide = (() => {
+  let text = source.replace(/^<div class="layers"[^\n]*>\r?\n([\s\S]*?)^<\/div>$/gm, (_, inner) =>
+    [...inner.matchAll(/^\s*<div><b>(.*?)<\/b><span>(.*?)<\/span><\/div>$/gm)]
+      .map(([, label, detail]) => `- **${label}**：${detail}`).join('\n')
+  );
+  text = text.replace(/<figure\b[^>]*>\s*<img\b([^>]+)>\s*<figcaption>([\s\S]*?)<\/figcaption>\s*<\/figure>/g, (_, attributes, rawCaption) => {
+    const src = attributes.match(/\bsrc="([^"]+)"/)?.[1];
+    const alt = attributes.match(/\balt="([^"]+)"/)?.[1];
+    if (!src || !alt) throw new Error('Figure without an image source or alt text');
+    const caption = rawCaption.replace(/<code>([\s\S]*?)<\/code>/g, '`$1`');
+    return `\n\n![${alt}](${src})\n\n*${caption}*\n\n`;
+  });
+  text = text.replace(/<div class="(?:figure-grid[^"]*|walkthrough-steps)"[^>]*>/g, '').replace(/<\/div>/g, '');
+  const sourcesStart = text.indexOf('## 六、资料来源');
+  if (sourcesStart < 0) throw new Error('Missing source chapter for Markdown citations');
+  text = text.slice(0, sourcesStart).replace(/\[S(\d+)\]/g, '[[S$1]](#source-s$1)') + text.slice(sourcesStart);
+  return text.replaceAll('](experiment-notes.html)', '](experiment-notes.md)').replace(/\n{3,}/g, '\n\n').trim();
+})();
+const readmeTemplate = fs.readFileSync(path.join(dir, 'README.template.md'), 'utf8');
+fs.writeFileSync(path.join(dir, 'README.md'), readmeTemplate.replace('{{GUIDE}}', markdownGuide), 'utf8');
+
 const esc = value => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 let html = marked.parse(source, { gfm: true });
 const headings = [];

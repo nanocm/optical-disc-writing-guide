@@ -4,6 +4,7 @@ const path = require('node:path');
 const root = __dirname;
 const guide = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const article = fs.readFileSync(path.join(root, 'content.md'), 'utf8');
+const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
 const errors = [];
 
 const sourceVideo = 'https://www.bilibili.com/video/BV1itur6qExK/';
@@ -40,6 +41,11 @@ for (const image of guide.match(/<img\b[^>]*>/g) || []) {
 }
 if (diagramRefs.length !== 14 || new Set(diagramRefs).size !== 14) errors.push(`Expected 14 distinct diagrams, found ${diagramRefs.length}`);
 if (figureRefs.length !== 20) errors.push(`Expected 20 disc/drive photographs and marks, found ${figureRefs.length}`);
+const readmeImages = [...readme.matchAll(/!\[[^\]]*\]\((assets\/[^)]+)\)/g)].map(match => match[1]);
+if (readmeImages.length !== 39) errors.push(`Expected 39 Markdown images, found ${readmeImages.length}`);
+for (const ref of readmeImages) if (!fs.existsSync(path.join(root, ref))) errors.push(`README.md: missing image ${ref}`);
+if (/<(?:figure|figcaption|div)\b/.test(readme)) errors.push('README.md still contains webpage-only figure markup');
+if (!readme.includes('## 五、刻录与读回校验')) errors.push('README.md is missing the full guide');
 for (const ref of diagramRefs) {
   const svg = fs.readFileSync(path.join(root, ref), 'utf8');
   if (!svg.includes('<title') || !svg.includes('<desc') || !svg.endsWith('</svg>')) errors.push(`${ref}: missing SVG description or closing tag`);
